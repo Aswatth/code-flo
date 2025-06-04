@@ -6,6 +6,21 @@ export default function CodeArea() {
   const { language, fileExtension, setLanguage } = languageStore();
   const { fileName } = fileNameStore();
 
+  const handleDownload = () => {
+    const blob = new Blob(["<PLACEHOLDER CODE>"]);
+
+    const url = URL.createObjectURL(blob);
+    const linkElement = document.createElement("a");
+    linkElement.href = url;
+    linkElement.download = fileName + fileExtension;
+
+    document.body.appendChild(linkElement);
+
+    linkElement.click();
+
+    document.body.removeChild(linkElement);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className={styles.page}>
@@ -20,6 +35,9 @@ export default function CodeArea() {
         <option>Go</option>
       </select>
       <div className={styles.code}></div>
+      <button className={styles.downloadButton} onClick={handleDownload}>
+        Download code
+      </button>
     </div>
   );
 }

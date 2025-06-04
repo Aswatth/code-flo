@@ -16,3 +16,17 @@
   padding: 10px;
 }
 
+.downloadButton {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  text-transform: capitalize;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.downloadButton:hover {
+  cursor: pointer;
+}
