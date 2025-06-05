@@ -1,0 +1,17 @@
+.node {
+  border: 2px solid black;
+  border-radius: 20px;
+  padding: 12px;
+  background-color: white;
+  box-shadow: 2px 2px black;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.messageField {
+  padding: 10px;
+  border-radius: 10px;
+}
