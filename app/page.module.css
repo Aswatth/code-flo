@@ -24,3 +24,19 @@
   border: 1px solid black;
   padding: 10px;
 }
+
+.addNodeButton {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 1000;
+  background: white;
+  border: 2px solid black;
+  box-shadow: 2px 2px black;
+}
+
+.addNodeButton:hover {
+  cursor: pointer;
+}
