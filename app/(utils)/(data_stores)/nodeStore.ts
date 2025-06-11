@@ -24,7 +24,7 @@ export const nodeStore = create<NodeMap>((set) => ({
 
         const sourceNode = state.nodeMap.get(connection.source);
         const targetNode = state.nodeMap.get(connection.target);
-        sourceNode?.addNode(targetNode!);
+        sourceNode?.setNextNode(targetNode!);
 
         return {edges: addEdge(connection, state.edges)};
       })

@@ -4,14 +4,8 @@ export class CFNode {
         this.nextNode = nextNode;
         this.name = name;
     }
-    addNode(nextNode: CFNode | null) {
-      if(this.getNextNode() == null) {
-        this.nextNode = nextNode;
-      } else {
-        nextNode?.addNode(this.nextNode);
-        this.addNode(nextNode);
-      }
-      
+    setNextNode(nextNode: CFNode | null) {
+      this.nextNode = nextNode;      
     }
     getNextNode() : CFNode | null {
         return this.nextNode;
