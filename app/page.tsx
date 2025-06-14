@@ -9,75 +9,74 @@ import {
   useNodesState,
   BackgroundVariant,
   Connection,
-  applyEdgeChanges,
+  addEdge,
+  useEdgesState,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 import CodeArea from "./(code-area)/page";
 import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
 import { IoMdAdd } from "react-icons/io";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { nodeStore } from "./(utils)/(data_stores)/nodeStore";
+import { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
 import { CFPrintNode, CFStartNode } from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
+import { RFNodeData, startNodeId } from "./(utils)/globals";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
-  const { nodeMap, setNode } = nodeStore();
   const [menu, setMenu] = useState(null);
   const ref = useRef(null);
-
   const nodeTypes = { startNode: StartNode, printNode: PrintNode };
 
-  const initialNodes = [
-    {
-      id: "START",
-      position: { x: 100, y: 100 },
-      type: "startNode",
-      data: { label: "start" },
+  const initialNode: RFNodeData = {
+    id: startNodeId,
+    position: { x: 100, y: 100 },
+    type: "startNode",
+    data: {
+      cfNodeData: new CFStartNode(startNodeId, fileName, null),
     },
-  ];
+  };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const { edges, setEdges } = nodeStore();
-
-  useEffect(() => {
-    const startNode = new CFStartNode(null, fileName);
-    setNode("START", startNode);
-  }, []);
-
-  useEffect(() => {
-    console.log(nodes);
-  }, [nodes]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([initialNode]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const handleAddNode = () => {
-    const newNode = {
-      id: "PRINT-" + new Date().toISOString(),
+    const newNodeId = "PRINT-" + new Date().toISOString();
+    const newNode: RFNodeData = {
+      id: newNodeId,
       type: "printNode",
       position: {
         x: 200,
         y: 200,
       },
-      data: { label: "PRINT" },
+      data: { cfNodeData: new CFPrintNode(newNodeId, "Hello world", null) },
     };
-    setNode(newNode.id, new CFPrintNode(null, "Hello world"));
     setNodes((nds) => nds.concat(newNode));
   };
 
-  const onConnect = useCallback((connectionState: Connection) => {
-    setEdges(connectionState);
-  }, []);
+  const onConnect = useCallback(
+    (connectionState: Connection) => {
+      const sourceCfNode = nodes.find((f) => f.id == connectionState.source)
+        ?.data.cfNodeData;
+      const targetCfNode = nodes.find((f) => f.id == connectionState.target)
+        ?.data.cfNodeData;
+
+      sourceCfNode?.setNextNode(targetCfNode!);
+      setEdges((edge) => addEdge(connectionState, edge));
+    },
+    [nodes, setEdges]
+  );
 
   const onNodeContextMenu = useCallback(
-    (event, node) => {
+    (event: any, node: any) => {
       event.preventDefault();
 
       const pane = ref.current.getBoundingClientRect();
 
       // Should not delete START node.
-      if (node.id != "START") {
+      if (node.id != startNodeId) {
         setMenu({
           id: node.id,
           top: event.clientY < pane.height - 200 && event.clientY,
@@ -102,7 +101,7 @@ export default function Home() {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
-        onEdgesChange={(changes) => setEdges(applyEdgeChanges(changes, edges))}
+        onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
@@ -117,10 +116,9 @@ export default function Home() {
             placeholder="Filename"
             value={fileName}
             onChange={(e) => {
-              const startNode = nodeMap.get("START") as CFStartNode;
+              const startNode = nodes.find((f) => f.id == startNodeId)?.data
+                .cfNodeData! as CFStartNode;
               startNode.setFileName(e.target.value);
-              setNode("START", startNode);
-
               setFileName(e.target.value);
             }}
           ></input>
@@ -131,7 +129,7 @@ export default function Home() {
         {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
       </ReactFlow>
       <div className={styles.code}>
-        <CodeArea></CodeArea>
+        {<CodeArea nodes={nodes} edges={edges}></CodeArea>}
       </div>
     </div>
   );

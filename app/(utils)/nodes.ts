@@ -1,8 +1,16 @@
 export class CFNode {
+    private readonly id:string = "";
     private readonly name:string = "";
-    constructor(private nextNode: CFNode | null, name:string) {
+    constructor(id:string, name:string, private nextNode: CFNode | null, ) {
         this.nextNode = nextNode;
+        this.id = id;
         this.name = name;
+    }
+    getId():string {
+        return this.id;
+    }
+    getName():string {
+        return this.name;
     }
     setNextNode(nextNode: CFNode | null) {
       this.nextNode = nextNode;      
@@ -10,14 +18,11 @@ export class CFNode {
     getNextNode() : CFNode | null {
         return this.nextNode;
     }
-    getName():string {
-        return this.name;
-    }
 }
 
 export class CFStartNode extends CFNode {
-    constructor(nextNode: CFNode | null, private fileName:string) {
-        super(nextNode, "START");
+    constructor(id:string,private fileName:string, nextNode: CFNode | null, ) {
+        super(id, "START", nextNode);
         this.fileName = fileName;
     }
     setFileName(fileName:string) {
@@ -29,8 +34,8 @@ export class CFStartNode extends CFNode {
 }
 
 export class CFPrintNode extends CFNode{
-    constructor(nextNode:CFNode | null, private message: string) {
-        super(nextNode, "PRINT");
+    constructor(id:string, private message: string, nextNode:CFNode | null, ) {
+        super(id, "PRINT", nextNode);
         this.message = message;
     }
     setMessage(message:string) {

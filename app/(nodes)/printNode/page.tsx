@@ -1,14 +1,13 @@
-import { nodeStore } from "@/app/(utils)/(data_stores)/nodeStore";
 import styles from "./page.module.css";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, Position, useReactFlow } from "@xyflow/react";
 import { CFPrintNode } from "@/app/(utils)/nodes";
 
 type PrintNodeProps = {
-  id: string;
+  readonly data: any;
 };
 
-export default function PrintNode({ id }: PrintNodeProps) {
-  const { nodeMap, setNode } = nodeStore();
+export default function PrintNode({ data }: PrintNodeProps) {
+  const { updateNode } = useReactFlow();
 
   return (
     <div className={styles.node}>
@@ -21,11 +20,12 @@ export default function PrintNode({ id }: PrintNodeProps) {
       <h3>PRINT</h3>
       <input
         className={styles.messageField}
-        value={(nodeMap.get(id) as CFPrintNode).getMessage()}
+        value={data.cfNodeData.getMessage()}
         onChange={(e) => {
-          const printNode = nodeMap.get(id) as CFPrintNode;
-          printNode.setMessage(e.target.value);
-          setNode(id, printNode);
+          const cfPrintNode = data.cfNodeData as CFPrintNode;
+          cfPrintNode.setMessage(e.target.value);
+
+          updateNode(cfPrintNode.getId(), data);
         }}
       ></input>
       <div className={styles.content}></div>

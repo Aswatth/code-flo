@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useReactFlow, getIncomers } from "@xyflow/react";
 import styles from "./page.module.css";
-import { nodeStore } from "../(utils)/(data_stores)/nodeStore";
+import { CFNode } from "../(utils)/nodes";
 
 export default function ContextMenu({
   id,
@@ -10,9 +10,8 @@ export default function ContextMenu({
   right,
   bottom,
   ...props
-}) {
+}: any) {
   const { getNode, getNodes, setNodes, setEdges, getEdges } = useReactFlow();
-  const { nodeMap, setNode } = nodeStore();
 
   const deleteSelectedode = useCallback(() => {
     const node = getNode(id)!;
@@ -25,10 +24,8 @@ export default function ContextMenu({
     setEdges((edges) => edges.filter((edge) => edge.source !== id));
 
     incomers.forEach((source) => {
-      const cfNode = nodeMap.get(source.id);
-      console.log(cfNode);
+      const cfNode = source.data.cfNodeData as CFNode;
       cfNode?.setNextNode(null);
-      setNode(source.id, cfNode!);
     });
   }, [id, setNodes, setEdges]);
 

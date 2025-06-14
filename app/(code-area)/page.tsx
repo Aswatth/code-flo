@@ -3,27 +3,34 @@ import { useEffect, useState } from "react";
 import { fileNameStore } from "../(utils)/(data_stores)/fileNameStore";
 import { languageStore } from "../(utils)/(data_stores)/languageStore";
 import styles from "./page.module.css";
-import { JavaParser } from "../(utils)/parsers/java_parser";
-import { nodeStore } from "../(utils)/(data_stores)/nodeStore";
+import { JavaCodeGenerator } from "../(utils)/code-generators/javaCodeGenerator";
+import { CodeGenerator } from "../(utils)/code-generators/codeGenerator";
+import { PythonCodeGenerator } from "../(utils)/code-generators/pythonCodeGenerator";
 import { CFStartNode } from "../(utils)/nodes";
-import { Parser } from "../(utils)/parsers/parser";
-import { PythonParser } from "../(utils)/parsers/python_parser";
+import { Edge } from "@xyflow/react";
+import { RFNodeData, startNodeId } from "../(utils)/globals";
 
-export default function CodeArea() {
+type CodeAreaProps = {
+  readonly nodes: RFNodeData[];
+  readonly edges: Edge[];
+};
+
+export default function CodeArea({ nodes, edges }: CodeAreaProps) {
   const { language, fileExtension, setLanguage } = languageStore();
   const { fileName } = fileNameStore();
-  const { nodeMap, edges } = nodeStore();
   const [code, setCode] = useState("");
 
   useEffect(() => {
-    let parser: Parser;
+    const startNode = nodes.find((f) => f.id == startNodeId)?.data
+      .cfNodeData! as CFStartNode;
+    let codeGenerator: CodeGenerator;
     if (language == "Java") {
-      parser = new JavaParser(nodeMap.get("START")! as CFStartNode);
+      codeGenerator = new JavaCodeGenerator();
     } else {
-      parser = new PythonParser(nodeMap.get("START")! as CFStartNode);
+      codeGenerator = new PythonCodeGenerator();
     }
-    setCode(parser.parse());
-  }, [nodeMap, edges, language]);
+    setCode(codeGenerator.generateCode(startNode));
+  }, [fileName, language, nodes, edges]);
 
   const handleDownload = () => {
     const blob = new Blob([code]);
