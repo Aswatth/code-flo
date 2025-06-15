@@ -1,0 +1,37 @@
+.variable {
+  width: 100%;
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 10px;
+  box-shadow: 1px 1px solid black;
+  padding: 10px;
+  margin-bottom: 10px;
+  user-select: none;
+  position: relative;
+}
+
+.content {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.content .label {
+  font-style: italic;
+  margin-right: 5px;
+}
+.content .field {
+  flex: 2;
+  border-radius: 10px;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 10;
+  right: 10;
+  color: black;
+}
+
+.deleteButton:hover {
+  color: red;
+  transform: scale(1.2);
+}

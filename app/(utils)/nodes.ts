@@ -45,3 +45,30 @@ export class CFPrintNode extends CFNode{
         return this.message;
     }
 }
+
+export class CFVariableNode extends CFNode {
+    constructor(id:string, private varType: string, private varName: string, private varValue: string, nextNode:CFNode | null) {
+        super(id, "VARIABLE", nextNode);
+        this.varType = varType;
+        this.varName = varName;
+        this.varValue = varValue;
+    }
+    setVarType(type: string) {
+        this.varType = type;
+    }
+    setVarName(name: string) {
+        this.varName = name;
+    }
+    setVarValue(value: string) {
+        this.varValue = value;
+    }
+    getVarType() {
+        return this.varType;
+    }
+    getVarName() {
+        return this.varName;
+    }
+    getVarValue() {
+        return this.varValue;
+    }
+}

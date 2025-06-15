@@ -11,24 +11,32 @@ import {
   Connection,
   addEdge,
   useEdgesState,
+  useReactFlow,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
-import CodeArea from "./(code-area)/page";
+import CodeArea from "./(code-area)/codeArea";
 import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
 import { IoMdAdd } from "react-icons/io";
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
-import { CFPrintNode, CFStartNode } from "./(utils)/nodes";
+import { CFPrintNode, CFStartNode, CFVariableNode } from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
+import VariableSpace from "./(variable-space)/variableSpace";
+import VariableNode from "./(nodes)/variableNode/page";
+import { VariableStore } from "./(utils)/(data_stores)/variableStore";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
   const [menu, setMenu] = useState(null);
   const ref = useRef(null);
-  const nodeTypes = { startNode: StartNode, printNode: PrintNode };
+  const nodeTypes = {
+    startNode: StartNode,
+    printNode: PrintNode,
+    variableNode: VariableNode,
+  };
 
   const initialNode: RFNodeData = {
     id: startNodeId,
@@ -41,6 +49,7 @@ export default function Home() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([initialNode]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { variables } = VariableStore();
 
   const handleAddNode = () => {
     const newNodeId = "PRINT-" + new Date().toISOString();
@@ -93,8 +102,49 @@ export default function Home() {
 
   const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
 
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const data = JSON.parse(
+        event.dataTransfer.getData("application/code-flo")
+      );
+      if (!data) return;
+
+      const position = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+
+      const newNodeId = data.varId + new Date().toISOString();
+      const newNode: RFNodeData = {
+        id: newNodeId,
+        type: data.nodeType,
+        position,
+        data: {
+          cfNodeData: variables.get(data.varId)!,
+        },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [variables]
+  );
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
+
+  const onVariableDelete = (deletedId: string) => {
+    setNodes((nds) => nds.filter((f) => !f.id.startsWith(deletedId)));
+  };
+
   return (
     <div className={styles.page}>
+      <div className={styles.variableSpace}>
+        <VariableSpace onDelete={onVariableDelete}></VariableSpace>
+      </div>
       <ReactFlow
         ref={ref}
         nodeTypes={nodeTypes}
@@ -106,6 +156,8 @@ export default function Home() {
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
         className={styles.designSpace}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
       >
         <Controls />
         <MiniMap />
