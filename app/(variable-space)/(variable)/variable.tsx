@@ -6,11 +6,10 @@ import styles from "./page.module.css";
 import { CFVariableNode } from "@/app/(utils)/nodes";
 import { VariableStore } from "@/app/(utils)/(data_stores)/variableStore";
 import { MdOutlineDelete } from "react-icons/md";
-import { useReactFlow } from "@xyflow/react";
 
 interface VariableProps {
   readonly cfVariable: CFVariableNode;
-  onDelete: CallableFunction;
+  readonly onDelete: CallableFunction;
 }
 
 export default function Variable({ cfVariable, onDelete }: VariableProps) {
@@ -119,7 +118,11 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
           )}
         </div>
 
-        <div className={styles.deleteButton} onClick={handleDelete}>
+        <div
+          role="button"
+          className={styles.deleteButton}
+          onClick={handleDelete}
+        >
           <MdOutlineDelete />
         </div>
       </div>

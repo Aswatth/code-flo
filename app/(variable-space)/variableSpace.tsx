@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+
 import styles from "./page.module.css";
 import { IoMdAdd } from "react-icons/io";
 import Variable from "./(variable)/variable";
@@ -7,7 +7,7 @@ import { VariableStore } from "../(utils)/(data_stores)/variableStore";
 import { CFVariableNode } from "../(utils)/nodes";
 
 type VariableSpaceProps = {
-  onDelete: CallableFunction
+  readonly onDelete: CallableFunction
 }
 
 export default function VariableSpace({onDelete}:VariableSpaceProps) {

@@ -11,7 +11,6 @@ import {
   Connection,
   addEdge,
   useEdgesState,
-  useReactFlow,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -21,7 +20,7 @@ import { IoMdAdd } from "react-icons/io";
 import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
-import { CFPrintNode, CFStartNode, CFVariableNode } from "./(utils)/nodes";
+import { CFPrintNode, CFStartNode } from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
