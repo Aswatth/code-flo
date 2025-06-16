@@ -10,12 +10,12 @@ interface VariableState {
 export const VariableStore = create<VariableState>((set) => ({
     variables: new Map<string,CFVariableNode>(),
     setVariable: (variable) => set((state) => {
-        const map = state.variables;
+        const map = new Map(state.variables);
         map.set(variable.getId(), variable);
         return {variables: map};
     }),
     deleteVariable: (id) => set((state) => {
-        const map = state.variables;
+        const map = new Map(state.variables);
         map.delete(id);
         return {variables: map};
     })

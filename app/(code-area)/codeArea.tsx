@@ -9,6 +9,7 @@ import { PythonCodeGenerator } from "../(utils)/code-generators/pythonCodeGenera
 import { CFStartNode } from "../(utils)/nodes";
 import { Edge } from "@xyflow/react";
 import { RFNodeData, startNodeId } from "../(utils)/globals";
+import { VariableStore } from "../(utils)/(data_stores)/variableStore";
 
 type CodeAreaProps = {
   readonly nodes: RFNodeData[];
@@ -19,18 +20,19 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
   const { language, fileExtension, setLanguage } = languageStore();
   const { fileName } = fileNameStore();
   const [code, setCode] = useState("");
+  const { variables } = VariableStore();
 
   useEffect(() => {
     const startNode = nodes.find((f) => f.id == startNodeId)?.data
       .cfNodeData! as CFStartNode;
     let codeGenerator: CodeGenerator;
     if (language == "Java") {
-      codeGenerator = new JavaCodeGenerator();
+      codeGenerator = new JavaCodeGenerator(variables);
     } else {
-      codeGenerator = new PythonCodeGenerator();
+      codeGenerator = new PythonCodeGenerator(variables);
     }
     setCode(codeGenerator.generateCode(startNode));
-  }, [fileName, language, nodes, edges]);
+  }, [fileName, language, variables, nodes, edges]);
 
   const handleDownload = () => {
     const blob = new Blob([code]);
