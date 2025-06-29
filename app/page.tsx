@@ -26,10 +26,12 @@ import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
 import VariableNode from "./(nodes)/variableNode/page";
 import { VariableStore } from "./(utils)/(data_stores)/variableStore";
+import PaneContextMenu from "./pane-context-menu/page";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
   const [menu, setMenu] = useState(null);
+  const [paneMenu, setPaneMenu] = useState(null);
   const ref = useRef(null);
   const nodeTypes = {
     startNode: StartNode,
@@ -49,20 +51,6 @@ export default function Home() {
   const [nodes, setNodes, onNodesChange] = useNodesState([initialNode]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { variables } = VariableStore();
-
-  const handleAddNode = () => {
-    const newNodeId = "PRINT-" + new Date().toISOString();
-    const newNode: RFNodeData = {
-      id: newNodeId,
-      type: "printNode",
-      position: {
-        x: 200,
-        y: 200,
-      },
-      data: { cfNodeData: new CFPrintNode(newNodeId, "Hello world", null) },
-    };
-    setNodes((nds) => nds.concat(newNode));
-  };
 
   const onConnect = useCallback(
     (connectionState: Connection) => {
@@ -99,7 +87,24 @@ export default function Home() {
     [setMenu]
   );
 
-  const onPaneClick = useCallback(() => setMenu(null), [setMenu]);
+  const onPaneClick = useCallback(() => {
+    setMenu(null);
+    setPaneMenu(null);
+  }, [setMenu, setPaneMenu]);
+
+  const onPaneContextMenu = useCallback(
+    (event: any) => {
+      event.preventDefault();
+
+      const pane = ref.current.getBoundingClientRect();
+
+      setPaneMenu({
+        top: event.clientY - pane.top,
+        left: event.clientX - pane.left,
+      });
+    },
+    [setPaneMenu]
+  );
 
   const onDrop = useCallback(
     (event: React.DragEvent) => {
@@ -154,6 +159,7 @@ export default function Home() {
         onConnect={onConnect}
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
+        onPaneContextMenu={onPaneContextMenu}
         className={styles.designSpace}
         onDrop={onDrop}
         onDragOver={onDragOver}
@@ -174,10 +180,8 @@ export default function Home() {
             }}
           ></input>
         </div>
-        <button className={styles.addNodeButton} onClick={handleAddNode}>
-          <IoMdAdd /> Add node
-        </button>
         {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
+        {paneMenu && <PaneContextMenu onClick={onPaneClick} {...paneMenu} />}
       </ReactFlow>
       <div className={styles.code}>
         {<CodeArea nodes={nodes} edges={edges}></CodeArea>}

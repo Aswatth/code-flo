@@ -1,0 +1,28 @@
+.contextMenu {
+  background: white;
+  border: 1px solid black;
+  border-radius: 12px;
+  box-shadow: 10px 19px 20px rgba(0, 0, 0, 10%);
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.nodeButton {
+  display: flex;
+}
+
+.nodeButton button {
+  flex: 1;
+  border: none;
+  background: white;
+  padding: 5px;
+  text-align: left;
+}
+
+.nodeButton button:hover {
+  background: black;
+  color: white;
+}
