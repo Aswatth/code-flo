@@ -1,7 +1,7 @@
 import { useReactFlow } from "@xyflow/react";
 import styles from "./page.module.css";
 import { RFNodeData } from "../(utils)/globals";
-import { CFPrintNode } from "../(utils)/nodes";
+import { CFOperationNode, CFPrintNode } from "../(utils)/nodes";
 
 export default function PaneContextMenu({ top, left, ...props }: any) {
   const { addNodes } = useReactFlow();
@@ -21,6 +21,36 @@ export default function PaneContextMenu({ top, left, ...props }: any) {
     addNodes(newNode);
   };
 
+  const handleAddOperationNode = () => {
+    const newNodeId = "OPERATION-" + new Date().toISOString();
+    const newNode: RFNodeData = {
+      id: newNodeId,
+      type: "operationNode",
+      position: {
+        x: left,
+        y: top,
+      },
+      data: { cfNodeData: new CFOperationNode(newNodeId, "+", ["", ""], null) },
+    };
+
+    addNodes(newNode);
+  };
+
+  const handleSubtractOperationNode = () => {
+    const newNodeId = "OPERATION-" + new Date().toISOString();
+    const newNode: RFNodeData = {
+      id: newNodeId,
+      type: "operationNode",
+      position: {
+        x: left,
+        y: top,
+      },
+      data: { cfNodeData: new CFOperationNode(newNodeId, "-", ["", ""], null) },
+    };
+
+    addNodes(newNode);
+  };
+
   return (
     <div style={{ top, left }} {...props} className={styles.contextMenu}>
       <h3>Nodes</h3>
@@ -29,10 +59,10 @@ export default function PaneContextMenu({ top, left, ...props }: any) {
         <button onClick={handleAddPrintNode}>Print</button>
       </div>
       <div className={styles.nodeButton}>
-        <button>Add</button>
+        <button onClick={handleAddOperationNode}>Add</button>
       </div>
       <div className={styles.nodeButton}>
-        <button>Subtract</button>
+        <button onClick={handleSubtractOperationNode}>Subtract</button>
       </div>
     </div>
   );

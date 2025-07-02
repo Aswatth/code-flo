@@ -1,4 +1,4 @@
-import { CFPrintNode, CFStartNode, CFVariableNode } from "./nodes";
+import { CFOperationNode, CFPrintNode, CFStartNode, CFVariableNode } from "./nodes";
 
 export const startNodeId:string = "START";
 
@@ -10,6 +10,6 @@ export interface RFNodeData {
         y: number,
     },
     data: {
-        cfNodeData: CFStartNode | CFPrintNode | CFVariableNode
+        cfNodeData: CFStartNode | CFPrintNode | CFVariableNode | CFOperationNode
     }
 }

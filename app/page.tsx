@@ -16,17 +16,18 @@ import {
 import "@xyflow/react/dist/style.css";
 import CodeArea from "./(code-area)/codeArea";
 import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
-import { IoMdAdd } from "react-icons/io";
 import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
-import { CFPrintNode, CFStartNode } from "./(utils)/nodes";
+import { CFStartNode } from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
 import VariableNode from "./(nodes)/variableNode/page";
 import { VariableStore } from "./(utils)/(data_stores)/variableStore";
 import PaneContextMenu from "./pane-context-menu/page";
+import OperationNode from "./(nodes)/operationNode/page";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
@@ -37,6 +38,7 @@ export default function Home() {
     startNode: StartNode,
     printNode: PrintNode,
     variableNode: VariableNode,
+    operationNode: OperationNode,
   };
 
   const initialNode: RFNodeData = {
@@ -146,6 +148,9 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
+      <div>
+        <Toaster position="top-center" />
+      </div>
       <div className={styles.variableSpace}>
         <VariableSpace onDelete={onVariableDelete}></VariableSpace>
       </div>
@@ -163,6 +168,7 @@ export default function Home() {
         className={styles.designSpace}
         onDrop={onDrop}
         onDragOver={onDragOver}
+        snapToGrid={false}
       >
         <Controls />
         <MiniMap />

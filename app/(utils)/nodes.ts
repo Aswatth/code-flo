@@ -72,3 +72,30 @@ export class CFVariableNode extends CFNode {
         return this.varValue;
     }
 }
+
+export class CFOperationNode extends CFNode {
+    constructor(id:string, private operator:string, private operands:(CFOperationNode|CFVariableNode|string)[], nextNode: CFNode|null) {
+        super(id, "OPERATION", nextNode);
+        this.operator = operator;
+        this.operands = operands;
+    }
+
+    getOperands() {
+        return this.operands;
+    }
+    getOperator() {
+        return this.operator;
+    }
+    addOperand(operand: CFOperationNode|CFVariableNode|string) {
+        this.operands.push(operand);
+    }
+    updateOperand(index: number, operand: CFOperationNode|CFVariableNode|string) {
+        this.operands[index] = operand;
+    }
+    removeOperand(indexToRemove: number) {
+        this.operands.splice(indexToRemove, 1);
+    }
+    setOperands(operands:(CFOperationNode|CFVariableNode|string)[]) {
+        this.operands = operands;
+    }
+}

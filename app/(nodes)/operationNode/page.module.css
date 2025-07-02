@@ -1,0 +1,49 @@
+.node {
+  border: 2px solid black;
+  border-radius: 20px;
+  padding: 12px;
+  background-color: white;
+  box-shadow: 2px 2px black;
+}
+
+.operandsHandle {
+    position: relative;    
+    background: greenyellow;
+    border: 0.5px solid black;
+}
+
+.handle {
+    background: greenyellow;
+    border: 0.5px solid black;
+}
+
+.addOperand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.addOperand button {
+    border: none;
+    background: transparent;
+    padding: 5px;
+    border-radius: 50%;
+    font-size: 130%;
+    z-index: 1000;
+}
+
+.addOperand button:hover {
+    color: blue;
+}
+
+.deleteOperand {
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    font-size: 130%;
+    padding: 5px;
+}
+
+.deleteOperand:hover {
+    color: red;
+}
