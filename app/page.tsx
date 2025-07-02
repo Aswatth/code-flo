@@ -11,6 +11,8 @@ import {
   Connection,
   addEdge,
   useEdgesState,
+  reconnectEdge,
+  Edge,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -35,6 +37,7 @@ export default function Home() {
   const [menu, setMenu] = useState(null);
   const [paneMenu, setPaneMenu] = useState(null);
   const ref = useRef(null);
+  const edgeReconnectSuccessful = useRef(true);
   const nodeTypes = {
     startNode: StartNode,
     printNode: PrintNode,
@@ -148,6 +151,23 @@ export default function Home() {
     setNodes((nds) => nds.filter((f) => !f.id.startsWith(deletedId)));
   };
 
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
+
+  const onReconnect = useCallback((oldEdge: any, newConnection: any) => {
+    edgeReconnectSuccessful.current = true;
+    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+  }, []);
+
+  const onReconnectEnd = useCallback((_: any, edge: Edge) => {
+    if (!edgeReconnectSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+
+    edgeReconnectSuccessful.current = true;
+  }, []);
+
   return (
     <div className={styles.page}>
       <div>
@@ -164,6 +184,9 @@ export default function Home() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onReconnect={onReconnect}
+        onReconnectStart={onReconnectStart}
+        onReconnectEnd={onReconnectEnd}
         onNodeContextMenu={onNodeContextMenu}
         onPaneClick={onPaneClick}
         onPaneContextMenu={onPaneContextMenu}
