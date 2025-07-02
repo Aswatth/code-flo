@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
 import { useReactFlow, getIncomers } from "@xyflow/react";
 import styles from "./page.module.css";
-import { CFNode } from "../(utils)/nodes";
+import { CFNode, CFVariableNode } from "../(utils)/nodes";
+import { RFNodeData } from "../(utils)/globals";
 
 export default function ContextMenu({
   id,
@@ -29,16 +30,39 @@ export default function ContextMenu({
     });
   }, [id, setNodes, setEdges]);
 
+  const convertToSetNode = () => {
+    //Delete current node.
+    deleteSelectedode();
+
+    //Create a new set node for the deleted variable node.
+    const node = getNode(id)!;
+    const nodePosition = node.position;
+
+    const newNodeId = "SET-" + id + "-" + new Date().toISOString();
+    const newNode: RFNodeData = {
+      id: newNodeId,
+      type: "setNode",
+      position: nodePosition,
+      data: {
+        cfNodeData: node.data.cfNodeData as CFVariableNode,
+      },
+    };
+
+    setNodes((nds) => nds.concat(newNode));
+  };
+
   return (
     <div
       style={{ top, left, right, bottom }}
       className={styles.contextMenu}
       {...props}
     >
-      <p style={{ margin: "0.5em" }}>
-        <small>node: {id}</small>
-      </p>
-      <button onClick={deleteSelectedode}>delete</button>
+      <button onClick={deleteSelectedode}>Delete node</button>
+      {(id as string).startsWith("VARIABLE") ? (
+        <button onClick={convertToSetNode}>Convert to SET node</button>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 }

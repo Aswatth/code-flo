@@ -28,6 +28,7 @@ import { VariableStore } from "./(utils)/(data_stores)/variableStore";
 import PaneContextMenu from "./pane-context-menu/page";
 import OperationNode from "./(nodes)/operationNode/page";
 import { Toaster } from "react-hot-toast";
+import SetNode from "./(nodes)/variableNode/setNode/page";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
@@ -38,6 +39,7 @@ export default function Home() {
     startNode: StartNode,
     printNode: PrintNode,
     variableNode: VariableNode,
+    setNode: SetNode,
     operationNode: OperationNode,
   };
 
