@@ -21,7 +21,7 @@ import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
 import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
-import { CFStartNode } from "./(utils)/nodes";
+import { CFPrintNode, CFStartNode, CFVariableNode } from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
@@ -66,7 +66,15 @@ export default function Home() {
       const targetCfNode = nodes.find((f) => f.id == connectionState.target)
         ?.data.cfNodeData;
 
-      sourceCfNode?.setNextNode(targetCfNode!);
+      if (
+        sourceCfNode instanceof CFVariableNode &&
+        targetCfNode instanceof CFPrintNode
+      ) {
+        targetCfNode.setMessage(sourceCfNode);
+      } else {
+        sourceCfNode?.setNextNode(targetCfNode!);
+      }
+
       setEdges((edge) => addEdge(connectionState, edge));
     },
     [nodes, setEdges]
@@ -147,9 +155,22 @@ export default function Home() {
     event.dataTransfer.dropEffect = "move";
   }, []);
 
-  const onVariableDelete = (deletedId: string) => {
-    setNodes((nds) => nds.filter((f) => !f.id.startsWith(deletedId)));
-  };
+  const onVariableDelete = useCallback(
+    (deletedId: string) => {
+      const edge = edges.find(
+        (f) => f.source.startsWith(deletedId) && f.target.startsWith("PRINT")
+      );
+
+      if (edge) {
+        const printNode = nodes.find((f) => f.id == edge.target)?.data
+          .cfNodeData as CFPrintNode;
+        printNode.setMessage("");
+      }
+
+      setNodes((nds) => nds.filter((f) => !f.id.startsWith(deletedId)));
+    },
+    [nodes, edges]
+  );
 
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
@@ -164,6 +185,13 @@ export default function Home() {
     (_: any, edge: Edge) => {
       if (!edgeReconnectSuccessful.current) {
         const node = nodes.find((f) => f.id == edge.source);
+        if (
+          edge.source.startsWith("VARIABLE") &&
+          edge.target.startsWith("PRINT")
+        ) {
+          const printNode = nodes.find((f) => f.id == edge.target);
+          (printNode?.data.cfNodeData as CFPrintNode).setMessage("");
+        }
         node?.data.cfNodeData.setNextNode(null);
         setEdges((eds) => eds.filter((e) => e.id !== edge.id));
       }

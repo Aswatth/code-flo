@@ -6,12 +6,25 @@
   box-shadow: 2px 2px black;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-}
-
 .messageField {
   padding: 10px;
   border-radius: 10px;
+}
+
+.handle, .printValueHandle{
+  width: 12px;
+  height: 12px;
+}
+
+.printValueHandle {
+  position: relative;
+  background-color: greenyellow;
+  margin-top: 12px;
+}
+
+.printValue {
+  margin-top: 12px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
 }

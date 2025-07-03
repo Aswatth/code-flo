@@ -34,14 +34,18 @@ export class CFStartNode extends CFNode {
 }
 
 export class CFPrintNode extends CFNode{
-    constructor(id:string, private message: string, nextNode:CFNode | null, ) {
+    constructor(id:string, private message: CFVariableNode|string, nextNode:CFNode | null, ) {
         super(id, "PRINT", nextNode);
         this.message = message;
     }
-    setMessage(message:string) {
+    setMessage(message:CFVariableNode|string) {
         this.message = message;
     }
-    getMessage():string {
+    getMessage():CFVariableNode|string {
+        if(this.message instanceof CFVariableNode) {
+            return this.message;
+        }
+        
         return this.message;
     }
 }

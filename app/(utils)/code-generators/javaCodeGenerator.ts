@@ -17,9 +17,17 @@ export class JavaCodeGenerator extends CodeGenerator {
                     code += this.generateCode(node.getNextNode()) 
                     code += "\t}\n}";
                     return code;
-                case "PRINT": 
-                    code += "System.out.println(\"" + (node as CFPrintNode).getMessage() + "\");\n";
+                case "PRINT": {
+                    let printNode = (node as CFPrintNode);
+
+                    if(printNode.getMessage() instanceof CFVariableNode) {
+                        code += "System.out.println(" + (printNode.getMessage() as CFVariableNode).getVarName() + ");\n";
+                    } else {
+                        code += "System.out.println(\"" + (printNode.getMessage() as string) + "\");\n";
+                    }
+                    
                     break;
+                }
             }
             node = node?.getNextNode();
         }

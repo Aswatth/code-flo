@@ -16,8 +16,15 @@ export class PythonCodeGenerator extends CodeGenerator {
                     code += this.generateCode(node.getNextNode()); 
                     return code;
                 case "PRINT": 
-                    code += "print(\"" + (node as CFPrintNode).getMessage() + "\")\n";
-                    break;
+                    {
+                        let printNode = (node as CFPrintNode);
+
+                    if(printNode.getMessage() instanceof CFVariableNode) {
+                        code += "print(" + (printNode.getMessage() as CFVariableNode).getVarName() + ");\n";
+                    } else {
+                        code += "print(\"" + (printNode.getMessage() as string) + "\");\n";
+                    }
+                    }
             }
             node = node?.getNextNode();
         }

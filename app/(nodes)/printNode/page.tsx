@@ -1,6 +1,11 @@
 import styles from "./page.module.css";
-import { Handle, Position, useReactFlow } from "@xyflow/react";
-import { CFPrintNode } from "@/app/(utils)/nodes";
+import {
+  Handle,
+  Position,
+  useNodeConnections,
+  useReactFlow,
+} from "@xyflow/react";
+import { CFPrintNode, CFVariableNode } from "@/app/(utils)/nodes";
 
 type PrintNodeProps = {
   readonly data: any;
@@ -15,25 +20,38 @@ export default function PrintNode({ data }: PrintNodeProps) {
         type="target"
         position={Position.Left}
         isConnectable={true}
-        style={{ width: "12px", height: "12px" }}
+        className={styles.handle}
       />
       <h3>PRINT</h3>
-      <input
-        className={styles.messageField}
-        value={data.cfNodeData.getMessage()}
-        onChange={(e) => {
-          const cfPrintNode = data.cfNodeData as CFPrintNode;
-          cfPrintNode.setMessage(e.target.value);
+      <div className={styles.printValue}>
+        <Handle
+          type="target"
+          position={Position.Left}
+          id="printValue"
+          isConnectable={true}
+          className={styles.printValueHandle}
+        />
+        {(data.cfNodeData as CFPrintNode).getMessage() instanceof
+        CFVariableNode ? (
+          <div />
+        ) : (
+          <input
+            className={styles.messageField}
+            value={data.cfNodeData.getMessage()}
+            onChange={(e) => {
+              const cfPrintNode = data.cfNodeData as CFPrintNode;
+              cfPrintNode.setMessage(e.target.value);
 
-          updateNode(cfPrintNode.getId(), data);
-        }}
-      ></input>
-      <div className={styles.content}></div>
+              updateNode(cfPrintNode.getId(), data);
+            }}
+          ></input>
+        )}
+      </div>
       <Handle
         type="source"
         position={Position.Right}
         isConnectable={true}
-        style={{ width: "12px", height: "12px" }}
+        className={styles.handle}
       />
     </div>
   );

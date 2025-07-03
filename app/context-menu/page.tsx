@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useReactFlow, getIncomers } from "@xyflow/react";
 import styles from "./page.module.css";
-import { CFNode, CFVariableNode } from "../(utils)/nodes";
+import { CFNode, CFPrintNode, CFVariableNode } from "../(utils)/nodes";
 import { RFNodeData } from "../(utils)/globals";
 
 export default function ContextMenu({
@@ -20,6 +20,16 @@ export default function ContextMenu({
     const nodes = getNodes();
 
     const incomers = getIncomers(node, nodes, edges);
+
+    // Handle deletion of variable node when connected to a print node.
+    const edge = edges.find(
+      (f) => f.source.startsWith(id) && f.target.startsWith("PRINT")
+    );
+    if (edge) {
+      const printNode = nodes.find((f) => f.id == edge.target)?.data
+        .cfNodeData as CFPrintNode;
+      printNode.setMessage("");
+    }
 
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
     setEdges((edges) =>
