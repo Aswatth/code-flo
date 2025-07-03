@@ -160,13 +160,18 @@ export default function Home() {
     setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
   }, []);
 
-  const onReconnectEnd = useCallback((_: any, edge: Edge) => {
-    if (!edgeReconnectSuccessful.current) {
-      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-    }
+  const onReconnectEnd = useCallback(
+    (_: any, edge: Edge) => {
+      if (!edgeReconnectSuccessful.current) {
+        const node = nodes.find((f) => f.id == edge.source);
+        node?.data.cfNodeData.setNextNode(null);
+        setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      }
 
-    edgeReconnectSuccessful.current = true;
-  }, []);
+      edgeReconnectSuccessful.current = true;
+    },
+    [nodes]
+  );
 
   return (
     <div className={styles.page}>
