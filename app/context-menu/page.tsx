@@ -22,7 +22,9 @@ export default function ContextMenu({
     const incomers = getIncomers(node, nodes, edges);
 
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
-    setEdges((edges) => edges.filter((edge) => edge.source !== id));
+    setEdges((edges) =>
+      edges.filter((edge) => edge.source !== id && edge.target !== id)
+    );
 
     incomers.forEach((source) => {
       const cfNode = source.data.cfNodeData as CFNode;
