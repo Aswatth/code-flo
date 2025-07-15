@@ -1,3 +1,4 @@
+import { DataType } from "../dataType";
 import { CFNode, CFPrintNode, CFStartNode, CFVariableNode } from "../nodes";
 import { CodeGenerator } from "./codeGenerator";
 
@@ -37,18 +38,12 @@ export class JavaCodeGenerator extends CodeGenerator {
     initializeVariables(): string {
         let code = "";
         this.variables.entries().forEach((entry) => {
-            if(entry[1].getVarType() == "string") {
-                code += "String "
-            } else {
-                code += entry[1].getVarType() + " ";
-            }
-            code += entry[1].getVarName() + " = ";
-
             switch(entry[1].getVarType()) {
-                case "char": code += "'" + entry[1].getVarValue() + "'";break;
-                case "string": code += "\"" + entry[1].getVarValue() + "\"";break;
-                case "boolean": code += entry[1].getVarValue().toLowerCase();break;
-                case "float": code += entry[1].getVarValue() + "f";break;
+                case DataType.Character: code += "char " + entry[1].getVarName() + " = '" + entry[1].getVarValue() + "'";break;
+                case DataType.String: code += "String " + entry[1].getVarName() + " = \"" + entry[1].getVarValue() + "\"";break;
+                case DataType.Integer: code += "int " + entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
+                case DataType.Decimal: code += "float " + entry[1].getVarName() + " = " + entry[1].getVarValue() + "f"; break;
+                case DataType.Boolean: code += "boolean " + entry[1].getVarName() + " = " + entry[1].getVarValue().toLowerCase(); break;
                 default: code += entry[1].getVarValue();
             }
             code += ";\n"

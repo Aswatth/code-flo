@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import { CFVariableNode } from "@/app/(utils)/nodes";
 import { VariableStore } from "@/app/(utils)/(data_stores)/variableStore";
 import { MdOutlineDelete } from "react-icons/md";
+import { DataType } from "@/app/(utils)/dataType";
 
 interface VariableProps {
   readonly cfVariable: CFVariableNode;
@@ -15,14 +16,9 @@ interface VariableProps {
 export default function Variable({ cfVariable, onDelete }: VariableProps) {
   const { setVariable, deleteVariable } = VariableStore();
 
-  const variableTypes = [
-    { displayName: "Integer", keyword: "int" },
-    { displayName: "Decimal", keyword: "float" },
-    { displayName: "Character", keyword: "char" },
-    { displayName: "Text", keyword: "string" },
-    { displayName: "True or False", keyword: "boolean" },
-  ];
-  const [selectedVariableType, setSelectedVariableType] = useState("Integer");
+  const [selectedVariableType, setSelectedVariableType] = useState(
+    DataType.Integer
+  );
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData(
@@ -52,18 +48,21 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
             id="varType"
             value={selectedVariableType}
             onChange={(e) => {
-              setSelectedVariableType(e.target.value);
-              cfVariable.setVarType(
-                variableTypes.find((f) => f.displayName == e.target.value)
-                  ?.keyword!
-              );
-              cfVariable.setVarValue("");
+              setSelectedVariableType(e.target.value as DataType);
+              cfVariable.setVarType(e.target.value as DataType);
+              if ((e.target.value as DataType) == DataType.Boolean) {
+                cfVariable.setVarValue("True");
+              } else {
+                cfVariable.setVarValue("");
+              }
               setVariable(cfVariable);
             }}
           >
-            {variableTypes.map((v) => {
-              return <option key={v.displayName}>{v.displayName}</option>;
-            })}
+            {Object.entries(DataType).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -88,16 +87,18 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
           <label htmlFor="varValue">Value:</label>
         </div>
         <div className={styles.field}>
-          {selectedVariableType != "True or False" ? (
+          {selectedVariableType != DataType.Boolean ? (
             <input
               id="varValue"
               type={
-                selectedVariableType == "Integer" ||
-                selectedVariableType == "Decimal"
+                selectedVariableType == DataType.Integer ||
+                selectedVariableType == DataType.Decimal
                   ? "number"
                   : "text"
               }
-              maxLength={selectedVariableType == "Character" ? 1 : undefined}
+              maxLength={
+                selectedVariableType == DataType.Character ? 1 : undefined
+              }
               value={cfVariable.getVarValue()}
               onChange={(e) => {
                 cfVariable.setVarValue(e.target.value);

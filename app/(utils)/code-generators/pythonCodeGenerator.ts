@@ -1,3 +1,4 @@
+import { DataType } from "../dataType";
 import { CFNode, CFPrintNode, CFVariableNode } from "../nodes";
 import { CodeGenerator } from "./codeGenerator";
 
@@ -34,11 +35,12 @@ export class PythonCodeGenerator extends CodeGenerator {
     initializeVariables(): string {
         let code = "";
         this.variables.entries().forEach((entry) => {
-            code += entry[1].getVarName() + " = ";
-
             switch(entry[1].getVarType()) {
-                case "char": code += "'" + entry[1].getVarValue() + "'";break;
-                case "string": code += "\"" + entry[1].getVarValue() + "\"";break;
+                case DataType.Character: code += entry[1].getVarName() + " = '" + entry[1].getVarValue() + "'";break;
+                case DataType.String: code += entry[1].getVarName() + " = \"" + entry[1].getVarValue() + "\"";break;
+                case DataType.Integer: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
+                case DataType.Decimal: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
+                case DataType.Boolean: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
                 default: code += entry[1].getVarValue();
             }
             code += ";\n"

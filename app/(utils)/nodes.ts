@@ -1,3 +1,5 @@
+import { DataType } from "./dataType";
+
 export class CFNode {
     private readonly id:string = "";
     private readonly name:string = "";
@@ -51,13 +53,13 @@ export class CFPrintNode extends CFNode{
 }
 
 export class CFVariableNode extends CFNode {
-    constructor(id:string, private varType: string, private varName: string, private varValue: string, nextNode:CFNode | null) {
+    constructor(id:string, private varType: DataType, private varName: string, private varValue: string, nextNode:CFNode | null) {
         super(id, "VARIABLE", nextNode);
         this.varType = varType;
         this.varName = varName;
         this.varValue = varValue;
     }
-    setVarType(type: string) {
+    setVarType(type: DataType) {
         this.varType = type;
     }
     setVarName(name: string) {
