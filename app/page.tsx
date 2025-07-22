@@ -68,7 +68,8 @@ export default function Home() {
 
       if (
         sourceCfNode instanceof CFVariableNode &&
-        targetCfNode instanceof CFPrintNode
+        targetCfNode instanceof CFPrintNode &&
+        connectionState.targetHandle == "printValue"
       ) {
         targetCfNode.setMessage(sourceCfNode);
       } else {

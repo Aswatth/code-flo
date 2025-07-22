@@ -51,9 +51,9 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               setSelectedVariableType(e.target.value as DataType);
               cfVariable.setVarType(e.target.value as DataType);
               if ((e.target.value as DataType) == DataType.Boolean) {
-                cfVariable.setVarValue("True");
+                cfVariable.setInitialVarValue("True");
               } else {
-                cfVariable.setVarValue("");
+                cfVariable.setInitialVarValue("");
               }
               setVariable(cfVariable);
             }}
@@ -99,17 +99,17 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               maxLength={
                 selectedVariableType == DataType.Character ? 1 : undefined
               }
-              value={cfVariable.getVarValue()}
+              value={cfVariable.getInitialVarValue()}
               onChange={(e) => {
-                cfVariable.setVarValue(e.target.value);
+                cfVariable.setInitialVarValue(e.target.value);
                 setVariable(cfVariable);
               }}
             ></input>
           ) : (
             <select
-              value={cfVariable.getVarValue()}
+              value={cfVariable.getInitialVarValue()}
               onChange={(e) => {
-                cfVariable.setVarValue(e.target.value);
+                cfVariable.setInitialVarValue(e.target.value);
                 setVariable(cfVariable);
               }}
             >

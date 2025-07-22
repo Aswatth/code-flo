@@ -12,20 +12,25 @@ export class PythonCodeGenerator extends CodeGenerator {
 
         while(node != null) {
             switch(node.getName()) {
-                case "START" : 
+                case "START" : { 
                     code += this.initializeVariables();
                     code += this.generateCode(node.getNextNode()); 
                     return code;
-                case "PRINT": 
-                    {
-                        let printNode = (node as CFPrintNode);
+                }
+                case "PRINT": {
+                    let printNode = (node as CFPrintNode);
 
                     if(printNode.getMessage() instanceof CFVariableNode) {
                         code += "print(" + (printNode.getMessage() as CFVariableNode).getVarName() + ");\n";
                     } else {
                         code += "print(\"" + (printNode.getMessage() as string) + "\");\n";
                     }
-                    }
+                    break;
+                }
+                case "VARIABLE": {
+                    let variableNode = (node as CFVariableNode);
+                    code += variableNode.getVarName() + " = " + variableNode.getVarValue() + ";";
+                }
             }
             node = node?.getNextNode();
         }
@@ -36,12 +41,12 @@ export class PythonCodeGenerator extends CodeGenerator {
         let code = "";
         this.variables.entries().forEach((entry) => {
             switch(entry[1].getVarType()) {
-                case DataType.Character: code += entry[1].getVarName() + " = '" + entry[1].getVarValue() + "'";break;
-                case DataType.String: code += entry[1].getVarName() + " = \"" + entry[1].getVarValue() + "\"";break;
-                case DataType.Integer: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
-                case DataType.Decimal: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
-                case DataType.Boolean: code += entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
-                default: code += entry[1].getVarValue();
+                case DataType.Character: code += entry[1].getVarName() + " = '" + entry[1].getInitialVarValue() + "'";break;
+                case DataType.String: code += entry[1].getVarName() + " = \"" + entry[1].getInitialVarValue() + "\"";break;
+                case DataType.Integer: code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue(); break;
+                case DataType.Decimal: code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue(); break;
+                case DataType.Boolean: code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue(); break;
+                default: code += entry[1].getInitialVarValue();
             }
             code += ";\n"
         })

@@ -53,17 +53,22 @@ export class CFPrintNode extends CFNode{
 }
 
 export class CFVariableNode extends CFNode {
-    constructor(id:string, private varType: DataType, private varName: string, private varValue: string, nextNode:CFNode | null) {
+    private varValue: string;
+    constructor(id:string, private varType: DataType, private varName: string, private initialVarValue: string, nextNode:CFNode | null) {
         super(id, "VARIABLE", nextNode);
         this.varType = varType;
         this.varName = varName;
-        this.varValue = varValue;
+        this.initialVarValue = initialVarValue;
+        this.varValue = initialVarValue;
     }
     setVarType(type: DataType) {
         this.varType = type;
     }
     setVarName(name: string) {
         this.varName = name;
+    }
+    setInitialVarValue(value: string) {
+        this.initialVarValue = value;
     }
     setVarValue(value: string) {
         this.varValue = value;
@@ -73,6 +78,9 @@ export class CFVariableNode extends CFNode {
     }
     getVarName() {
         return this.varName;
+    }
+    getInitialVarValue() {
+        return this.initialVarValue;
     }
     getVarValue() {
         return this.varValue;

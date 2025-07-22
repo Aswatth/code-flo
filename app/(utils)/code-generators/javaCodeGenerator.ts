@@ -11,13 +11,15 @@ export class JavaCodeGenerator extends CodeGenerator {
         let code = "";
 
         while(node != null) {
-            switch(node.getName()) {
-                case "START" : 
-                    code += "class " + (node as CFStartNode).getFileName() + " {\n\tpublic static void main(String []args) {\n\t\t";
-                    code += this.initializeVariables();
-                    code += this.generateCode(node.getNextNode()) 
-                    code += "\t}\n}";
-                    return code;
+            const nodeName = node.getName();
+            switch(nodeName) {
+                case "START": {
+                code += "class " + (node as CFStartNode).getFileName() + " {\n\tpublic static void main(String []args) {\n\t\t";
+                code += this.initializeVariables();
+                code += this.generateCode(node.getNextNode()) 
+                code += "\t}\n}";
+                return code;
+                } 
                 case "PRINT": {
                     let printNode = (node as CFPrintNode);
 
@@ -26,8 +28,11 @@ export class JavaCodeGenerator extends CodeGenerator {
                     } else {
                         code += "System.out.println(\"" + (printNode.getMessage() as string) + "\");\n";
                     }
-                    
                     break;
+                }
+                case "VARIABLE": {
+                    let variableNode = (node as CFVariableNode);
+                    code += variableNode.getVarName() + " = " + variableNode.getVarValue() + ";";
                 }
             }
             node = node?.getNextNode();
@@ -39,12 +44,12 @@ export class JavaCodeGenerator extends CodeGenerator {
         let code = "";
         this.variables.entries().forEach((entry) => {
             switch(entry[1].getVarType()) {
-                case DataType.Character: code += "char " + entry[1].getVarName() + " = '" + entry[1].getVarValue() + "'";break;
-                case DataType.String: code += "String " + entry[1].getVarName() + " = \"" + entry[1].getVarValue() + "\"";break;
-                case DataType.Integer: code += "int " + entry[1].getVarName() + " = " + entry[1].getVarValue(); break;
-                case DataType.Decimal: code += "float " + entry[1].getVarName() + " = " + entry[1].getVarValue() + "f"; break;
-                case DataType.Boolean: code += "boolean " + entry[1].getVarName() + " = " + entry[1].getVarValue().toLowerCase(); break;
-                default: code += entry[1].getVarValue();
+                case DataType.Character: code += "char " + entry[1].getVarName() + " = '" + entry[1].getInitialVarValue() + "'";break;
+                case DataType.String: code += "String " + entry[1].getVarName() + " = \"" + entry[1].getInitialVarValue() + "\"";break;
+                case DataType.Integer: code += "int " + entry[1].getVarName() + " = " + entry[1].getInitialVarValue(); break;
+                case DataType.Decimal: code += "float " + entry[1].getVarName() + " = " + entry[1].getInitialVarValue() + "f"; break;
+                case DataType.Boolean: code += "boolean " + entry[1].getVarName() + " = " + entry[1].getInitialVarValue().toLowerCase(); break;
+                default: code += entry[1].getInitialVarValue();
             }
             code += ";\n"
         })
