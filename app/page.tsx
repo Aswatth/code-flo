@@ -67,13 +67,22 @@ export default function Home() {
         ?.data.cfNodeData;
 
       if (
+        connectionState.sourceHandle == null &&
+        connectionState.targetHandle == null
+      ) {
+        sourceCfNode?.setNextNode(targetCfNode!);
+      } else if (
         sourceCfNode instanceof CFVariableNode &&
         targetCfNode instanceof CFPrintNode &&
         connectionState.targetHandle == "printValue"
       ) {
         targetCfNode.setMessage(sourceCfNode);
-      } else {
-        sourceCfNode?.setNextNode(targetCfNode!);
+      } else if (
+        sourceCfNode instanceof CFVariableNode &&
+        targetCfNode instanceof CFVariableNode &&
+        connectionState.targetHandle == "set"
+      ) {
+        targetCfNode.setVarValue(sourceCfNode);
       }
 
       setEdges((edge) => addEdge(connectionState, edge));
@@ -192,6 +201,14 @@ export default function Home() {
         ) {
           const printNode = nodes.find((f) => f.id == edge.target);
           (printNode?.data.cfNodeData as CFPrintNode).setMessage("");
+        }
+
+        if (
+          edge.source.startsWith("VARIABLE") &&
+          edge.target.startsWith("SET")
+        ) {
+          const variableNode = nodes.find((f) => f.id == edge.target);
+          (variableNode?.data.cfNodeData as CFVariableNode).setVarValue("");
         }
         node?.data.cfNodeData.setNextNode(null);
         setEdges((eds) => eds.filter((e) => e.id !== edge.id));

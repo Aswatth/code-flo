@@ -16,31 +16,47 @@ export default function SetNode({ data }: SetNodeProps) {
     const variableNodeData = data.cfNodeData as CFVariableNode;
     const variableType = variableNodeData.getVarType();
 
-    const handleInputChange = (
-      e: ChangeEvent<HTMLSelectElement | HTMLInputElement>
-    ) => {
-      variableNodeData.setVarValue(e.target.value);
-      setVariable(variableNodeData);
-    };
+    if (!(variableNodeData.getVarValue() instanceof CFVariableNode)) {
+      const handleInputChange = (
+        e: ChangeEvent<HTMLSelectElement | HTMLInputElement>
+      ) => {
+        variableNodeData.setVarValue(e.target.value);
+        setVariable(variableNodeData);
+      };
 
-    if (variableType == DataType.Integer || variableType == DataType.Decimal) {
-      return <input type="number" onChange={handleInputChange}></input>;
-    } else if (variableType == DataType.Character) {
-      return (
-        <input type="text" maxLength={1} onChange={handleInputChange}></input>
-      );
-    } else if (variableType == DataType.Boolean) {
-      return (
-        <select
-          value={variableNodeData.getVarValue()}
-          onChange={handleInputChange}
-        >
-          <option value={"True"}>True</option>
-          <option value={"False"}>False</option>
-        </select>
-      );
-    } else {
-      return <input type="text" onChange={handleInputChange}></input>;
+      if (
+        variableType == DataType.Integer ||
+        variableType == DataType.Decimal
+      ) {
+        return (
+          <input
+            type="number"
+            value={variableNodeData.getVarValue() as string}
+            onChange={handleInputChange}
+          ></input>
+        );
+      } else if (variableType == DataType.Character) {
+        return (
+          <input
+            type="text"
+            value={variableNodeData.getVarValue() as string}
+            maxLength={1}
+            onChange={handleInputChange}
+          ></input>
+        );
+      } else if (variableType == DataType.Boolean) {
+        return (
+          <select
+            value={variableNodeData.getVarValue() as string}
+            onChange={handleInputChange}
+          >
+            <option value={"True"}>True</option>
+            <option value={"False"}>False</option>
+          </select>
+        );
+      } else {
+        return <input type="text" onChange={handleInputChange}></input>;
+      }
     }
   }
   return (
