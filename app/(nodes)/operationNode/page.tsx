@@ -19,6 +19,12 @@ export default function OperationNode({ data }: OperationNodeProps) {
         return "ADD";
       case "-":
         return "SUBTRACT";
+      case "*":
+        return "MULTIPLY";
+      case "/":
+        return "DIVIDE";
+      case "%":
+        return "MODULUS";
       default:
         return "ADD";
     }
@@ -38,16 +44,16 @@ export default function OperationNode({ data }: OperationNodeProps) {
                 type="target"
                 position={Position.Left}
                 isConnectable={true}
-                id={data.cfNodeData.getId() + idx}
+                id={data.cfNodeData.getId() + "$" + idx}
                 style={{ width: "12px", height: "12px" }}
                 className={styles.operandsHandle}
               />
               <input
                 value={m.toString()}
-                placeholder="value"
+                placeholder="Value"
                 type="number"
+                className={styles.inputField}
                 onChange={(e) => {
-                  console.log(m.toString());
                   const cfOperationNode = data.cfNodeData as CFOperationNode;
                   cfOperationNode.updateOperand(idx, e.target.value);
                   updateNode(cfOperationNode.getId(), data);
@@ -70,7 +76,18 @@ export default function OperationNode({ data }: OperationNodeProps) {
             </div>
           );
         } else {
-          return <div key={data.cfNodeData.getId() + idx}></div>;
+          return (
+            <div key={data.cfNodeData.getId() + idx} style={{ margin: "10px" }}>
+              <Handle
+                type="target"
+                position={Position.Left}
+                isConnectable={true}
+                id={data.cfNodeData.getId() + "$" + idx}
+                style={{ width: "12px", height: "12px" }}
+                className={styles.operandsHandle}
+              />
+            </div>
+          );
         }
       })}
       <Handle

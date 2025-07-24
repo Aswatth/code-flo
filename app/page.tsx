@@ -21,7 +21,12 @@ import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
 import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
-import { CFPrintNode, CFStartNode, CFVariableNode } from "./(utils)/nodes";
+import {
+  CFOperationNode,
+  CFPrintNode,
+  CFStartNode,
+  CFVariableNode,
+} from "./(utils)/nodes";
 import ContextMenu from "./context-menu/page";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
@@ -72,17 +77,28 @@ export default function Home() {
       ) {
         sourceCfNode?.setNextNode(targetCfNode!);
       } else if (
-        sourceCfNode instanceof CFVariableNode &&
+        (sourceCfNode instanceof CFVariableNode ||
+          sourceCfNode instanceof CFOperationNode) &&
         targetCfNode instanceof CFPrintNode &&
         connectionState.targetHandle == "printValue"
       ) {
         targetCfNode.setMessage(sourceCfNode);
       } else if (
-        sourceCfNode instanceof CFVariableNode &&
+        (sourceCfNode instanceof CFVariableNode ||
+          sourceCfNode instanceof CFOperationNode) &&
         targetCfNode instanceof CFVariableNode &&
         connectionState.targetHandle == "set"
       ) {
         targetCfNode.setVarValue(sourceCfNode);
+      } else if (
+        (sourceCfNode instanceof CFVariableNode ||
+          sourceCfNode instanceof CFOperationNode) &&
+        targetCfNode instanceof CFOperationNode
+      ) {
+        const indexToUpdate = parseInt(
+          connectionState.targetHandle?.split("$")[1]!
+        );
+        targetCfNode.updateOperand(indexToUpdate, sourceCfNode);
       }
 
       setEdges((edge) => addEdge(connectionState, edge));
@@ -196,19 +212,30 @@ export default function Home() {
       if (!edgeReconnectSuccessful.current) {
         const node = nodes.find((f) => f.id == edge.source);
         if (
-          edge.source.startsWith("VARIABLE") &&
+          (edge.source.startsWith("VARIABLE") ||
+            edge.source.startsWith("OPERATION")) &&
           edge.target.startsWith("PRINT")
         ) {
           const printNode = nodes.find((f) => f.id == edge.target);
           (printNode?.data.cfNodeData as CFPrintNode).setMessage("");
-        }
-
-        if (
-          edge.source.startsWith("VARIABLE") &&
+        } else if (
+          (edge.source.startsWith("VARIABLE") ||
+            edge.source.startsWith("OPERATION")) &&
           edge.target.startsWith("SET")
         ) {
           const variableNode = nodes.find((f) => f.id == edge.target);
           (variableNode?.data.cfNodeData as CFVariableNode).setVarValue("");
+        } else if (
+          (edge.source.startsWith("VARIABLE") ||
+            edge.source.startsWith("OPERATION")) &&
+          edge.target.startsWith("OPERATION")
+        ) {
+          const operationNode = nodes.find((f) => f.id == edge.target);
+          const indexToUpdate = parseInt(edge.targetHandle?.split("$")[1]!);
+          (operationNode?.data.cfNodeData as CFOperationNode).updateOperand(
+            indexToUpdate,
+            ""
+          );
         }
         node?.data.cfNodeData.setNextNode(null);
         setEdges((eds) => eds.filter((e) => e.id !== edge.id));

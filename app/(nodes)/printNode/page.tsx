@@ -31,10 +31,7 @@ export default function PrintNode({ data }: PrintNodeProps) {
           isConnectable={true}
           className={styles.printValueHandle}
         />
-        {(data.cfNodeData as CFPrintNode).getMessage() instanceof
-        CFVariableNode ? (
-          <div />
-        ) : (
+        {typeof (data.cfNodeData as CFPrintNode).getMessage() === "string" ? (
           <input
             className={styles.messageField}
             value={data.cfNodeData.getMessage()}
@@ -45,6 +42,8 @@ export default function PrintNode({ data }: PrintNodeProps) {
               updateNode(cfPrintNode.getId(), data);
             }}
           ></input>
+        ) : (
+          <div />
         )}
       </div>
       <Handle

@@ -1,5 +1,11 @@
 import { DataType } from "../dataType";
-import { CFNode, CFPrintNode, CFStartNode, CFVariableNode } from "../nodes";
+import {
+  CFNode,
+  CFOperationNode,
+  CFPrintNode,
+  CFStartNode,
+  CFVariableNode,
+} from "../nodes";
 import { CodeGenerator } from "./codeGenerator";
 
 export class JavaCodeGenerator extends CodeGenerator {
@@ -25,8 +31,12 @@ export class JavaCodeGenerator extends CodeGenerator {
         }
         case "PRINT": {
           let printNode = node as CFPrintNode;
-
-          if (printNode.getMessage() instanceof CFVariableNode) {
+          if (printNode.getMessage() instanceof CFOperationNode) {
+            code +=
+              "System.out.println(" +
+              this.generateCode(printNode.getMessage() as CFOperationNode) +
+              ");\n";
+          } else if (printNode.getMessage() instanceof CFVariableNode) {
             code +=
               "System.out.println(" +
               (printNode.getMessage() as CFVariableNode).getVarName() +
@@ -45,6 +55,10 @@ export class JavaCodeGenerator extends CodeGenerator {
 
           if (variableNode.getVarValue() instanceof CFVariableNode) {
             code += (variableNode.getVarValue() as CFVariableNode).getVarName();
+          } else if (variableNode.getVarValue() instanceof CFOperationNode) {
+            code += this.generateCode(
+              variableNode.getVarValue() as CFOperationNode
+            );
           } else {
             switch (variableNode.getVarType()) {
               case DataType.Character:
@@ -63,6 +77,33 @@ export class JavaCodeGenerator extends CodeGenerator {
           }
 
           code += ";";
+          break;
+        }
+        case "OPERATION": {
+          const operationNode = node as CFOperationNode;
+          const operands = operationNode.getOperands();
+          const lastOperand = operands[operands.length - 1];
+
+          code += "(";
+          for (let i = 0; i < operands.length - 1; ++i) {
+            if (operands[i] instanceof CFVariableNode) {
+              code += (operands[i] as CFVariableNode).getVarName();
+            } else if (operands[i] instanceof CFOperationNode) {
+              code += this.generateCode(operands[i] as CFOperationNode);
+            } else {
+              code += operands[i];
+            }
+            code += operationNode.getOperator();
+          }
+          if (lastOperand instanceof CFVariableNode) {
+            code += lastOperand.getVarName();
+          } else if (lastOperand instanceof CFOperationNode) {
+            code += this.generateCode(lastOperand);
+          } else {
+            code += lastOperand;
+          }
+          code += ")";
+          break;
         }
       }
       node = node?.getNextNode();

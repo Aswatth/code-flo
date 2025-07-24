@@ -16,7 +16,7 @@ export default function SetNode({ data }: SetNodeProps) {
     const variableNodeData = data.cfNodeData as CFVariableNode;
     const variableType = variableNodeData.getVarType();
 
-    if (!(variableNodeData.getVarValue() instanceof CFVariableNode)) {
+    if (typeof variableNodeData.getVarValue() === "string") {
       const handleInputChange = (
         e: ChangeEvent<HTMLSelectElement | HTMLInputElement>
       ) => {
@@ -62,7 +62,7 @@ export default function SetNode({ data }: SetNodeProps) {
   return (
     <div className={styles.node}>
       <h3>
-        Set <i>{"\t" + (data.cfNodeData as CFVariableNode).getVarName()}</i>
+        SET <i>{"\t" + (data.cfNodeData as CFVariableNode).getVarName()}</i>
       </h3>
       <Handle
         type="target"

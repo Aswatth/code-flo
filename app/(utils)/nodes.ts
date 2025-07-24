@@ -1,4 +1,5 @@
 import { DataType } from "./dataType";
+import { Operator } from "./operator";
 
 export class CFNode {
   private readonly id: string = "";
@@ -38,26 +39,22 @@ export class CFStartNode extends CFNode {
 export class CFPrintNode extends CFNode {
   constructor(
     id: string,
-    private message: CFVariableNode | string,
+    private message: CFOperationNode | CFVariableNode | string,
     nextNode: CFNode | null
   ) {
     super(id, "PRINT", nextNode);
     this.message = message;
   }
-  setMessage(message: CFVariableNode | string) {
+  setMessage(message: CFOperationNode | CFVariableNode | string) {
     this.message = message;
   }
-  getMessage(): CFVariableNode | string {
-    if (this.message instanceof CFVariableNode) {
-      return this.message;
-    }
-
+  getMessage(): CFOperationNode | CFVariableNode | string {
     return this.message;
   }
 }
 
 export class CFVariableNode extends CFNode {
-  private varValue: string | CFVariableNode;
+  private varValue: string | CFVariableNode | CFOperationNode;
   constructor(
     id: string,
     private varType: DataType,
@@ -83,7 +80,7 @@ export class CFVariableNode extends CFNode {
       this.varValue = value;
     }
   }
-  setVarValue(value: string | CFVariableNode) {
+  setVarValue(value: string | CFVariableNode | CFOperationNode) {
     this.varValue = value;
   }
   getVarType() {
@@ -103,7 +100,7 @@ export class CFVariableNode extends CFNode {
 export class CFOperationNode extends CFNode {
   constructor(
     id: string,
-    private operator: string,
+    private readonly operator: Operator,
     private operands: (CFOperationNode | CFVariableNode | string)[],
     nextNode: CFNode | null
   ) {
