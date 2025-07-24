@@ -21,7 +21,6 @@ export class JavaCodeGenerator extends CodeGenerator {
       const nodeName = node.getName();
       switch (nodeName) {
         case "START": {
-          
           code +=
             "class " +
             (node as CFStartNode).getFileName() +

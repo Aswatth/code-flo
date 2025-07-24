@@ -10,6 +10,8 @@ import { CFStartNode } from "../(utils)/nodes";
 import { Edge } from "@xyflow/react";
 import { RFNodeData, startNodeId } from "../(utils)/globals";
 import { VariableStore } from "../(utils)/(data_stores)/variableStore";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { a11yLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 type CodeAreaProps = {
   readonly nodes: RFNodeData[];
@@ -63,9 +65,15 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
         <option>Javascript</option>
         <option>Go</option>
       </select>
-      <div className={styles.code}>
-        <p>{code}</p>
-      </div>
+      <SyntaxHighlighter
+        language={language.toLowerCase()}
+        showLineNumbers={true}
+        showInlineLineNumbers={true}
+        style={a11yLight}
+        customStyle={{ flex: "1" }}
+      >
+        {code}
+      </SyntaxHighlighter>
       <button className={styles.downloadButton} onClick={handleDownload}>
         Download code
       </button>

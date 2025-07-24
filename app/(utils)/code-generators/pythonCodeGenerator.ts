@@ -7,7 +7,7 @@ export class PythonCodeGenerator extends CodeGenerator {
     super();
     this.variables = variables;
   }
-  generateCode(node: CFNode | null, indendatationLevel:number = 0): string {
+  generateCode(node: CFNode | null, indendatationLevel: number = 0): string {
     let code = "";
 
     while (node != null) {
@@ -59,7 +59,7 @@ export class PythonCodeGenerator extends CodeGenerator {
             }
           }
 
-          code += ";";
+          code += ";\n";
           break;
         }
         case "OPERATION": {
@@ -93,7 +93,7 @@ export class PythonCodeGenerator extends CodeGenerator {
 
     return code;
   }
-  initializeVariables(indentationLevel:number): string {
+  initializeVariables(indentationLevel: number): string {
     let code = "";
     this.variables.entries().forEach((entry) => {
       code += `${"\t".repeat(indentationLevel)}`;
