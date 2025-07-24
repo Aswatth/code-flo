@@ -7,14 +7,14 @@ export class PythonCodeGenerator extends CodeGenerator {
     super();
     this.variables = variables;
   }
-  generateCode(node: CFNode | null): string {
+  generateCode(node: CFNode | null, indendatationLevel:number = 0): string {
     let code = "";
 
     while (node != null) {
       switch (node.getName()) {
         case "START": {
-          code += this.initializeVariables();
-          code += this.generateCode(node.getNextNode());
+          code += this.initializeVariables(indendatationLevel);
+          code += this.generateCode(node.getNextNode(), indendatationLevel + 1);
           return code;
         }
         case "PRINT": {
@@ -93,9 +93,10 @@ export class PythonCodeGenerator extends CodeGenerator {
 
     return code;
   }
-  initializeVariables(): string {
+  initializeVariables(indentationLevel:number): string {
     let code = "";
     this.variables.entries().forEach((entry) => {
+      code += `${"\t".repeat(indentationLevel)}`;
       switch (entry[1].getVarType()) {
         case DataType.Character:
           code +=

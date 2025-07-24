@@ -28,10 +28,11 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
     let codeGenerator: CodeGenerator;
     if (language == "Java") {
       codeGenerator = new JavaCodeGenerator(variables);
+      setCode(codeGenerator.generateCode(startNode, 1));
     } else {
       codeGenerator = new PythonCodeGenerator(variables);
+      setCode(codeGenerator.generateCode(startNode, 0));
     }
-    setCode(codeGenerator.generateCode(startNode));
   }, [fileName, language, variables, nodes, edges]);
 
   const handleDownload = () => {
@@ -62,7 +63,9 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
         <option>Javascript</option>
         <option>Go</option>
       </select>
-      <div className={styles.code}>{code}</div>
+      <div className={styles.code}>
+        <p>{code}</p>
+      </div>
       <button className={styles.downloadButton} onClick={handleDownload}>
         Download code
       </button>

@@ -13,36 +13,44 @@ export class JavaCodeGenerator extends CodeGenerator {
     super();
     this.variables = variables;
   }
-  generateCode(node: CFNode | null): string {
+  generateCode(node: CFNode | null, indentationLevel: number): string {
     let code = "";
 
     while (node != null) {
+      let indentation = "\t".repeat(indentationLevel);
       const nodeName = node.getName();
       switch (nodeName) {
         case "START": {
+          
           code +=
             "class " +
             (node as CFStartNode).getFileName() +
-            " {\n\tpublic static void main(String []args) {\n\t\t";
-          code += this.initializeVariables();
-          code += this.generateCode(node.getNextNode());
-          code += "\t}\n}";
+            ` {\n${indentation}public static void main(String []args) {\n`;
+          code += this.initializeVariables(indentationLevel + 1);
+          code += this.generateCode(node.getNextNode(), indentationLevel + 1);
+          code += `${indentation}}\n}`;
           return code;
         }
         case "PRINT": {
           let printNode = node as CFPrintNode;
           if (printNode.getMessage() instanceof CFOperationNode) {
             code +=
+              indentation +
               "System.out.println(" +
-              this.generateCode(printNode.getMessage() as CFOperationNode) +
+              this.generateCode(
+                printNode.getMessage() as CFOperationNode,
+                indentationLevel
+              ) +
               ");\n";
           } else if (printNode.getMessage() instanceof CFVariableNode) {
             code +=
+              indentation +
               "System.out.println(" +
               (printNode.getMessage() as CFVariableNode).getVarName() +
               ");\n";
           } else {
             code +=
+              indentation +
               'System.out.println("' +
               (printNode.getMessage() as string) +
               '");\n';
@@ -51,13 +59,14 @@ export class JavaCodeGenerator extends CodeGenerator {
         }
         case "VARIABLE": {
           let variableNode = node as CFVariableNode;
-          code += variableNode.getVarName() + " = ";
+          code += indentation + variableNode.getVarName() + " = ";
 
           if (variableNode.getVarValue() instanceof CFVariableNode) {
             code += (variableNode.getVarValue() as CFVariableNode).getVarName();
           } else if (variableNode.getVarValue() instanceof CFOperationNode) {
             code += this.generateCode(
-              variableNode.getVarValue() as CFOperationNode
+              variableNode.getVarValue() as CFOperationNode,
+              indentationLevel
             );
           } else {
             switch (variableNode.getVarType()) {
@@ -76,7 +85,7 @@ export class JavaCodeGenerator extends CodeGenerator {
             }
           }
 
-          code += ";";
+          code += ";\n";
           break;
         }
         case "OPERATION": {
@@ -89,7 +98,10 @@ export class JavaCodeGenerator extends CodeGenerator {
             if (operands[i] instanceof CFVariableNode) {
               code += (operands[i] as CFVariableNode).getVarName();
             } else if (operands[i] instanceof CFOperationNode) {
-              code += this.generateCode(operands[i] as CFOperationNode);
+              code += this.generateCode(
+                operands[i] as CFOperationNode,
+                indentationLevel
+              );
             } else {
               code += operands[i];
             }
@@ -98,7 +110,7 @@ export class JavaCodeGenerator extends CodeGenerator {
           if (lastOperand instanceof CFVariableNode) {
             code += lastOperand.getVarName();
           } else if (lastOperand instanceof CFOperationNode) {
-            code += this.generateCode(lastOperand);
+            code += this.generateCode(lastOperand, indentationLevel);
           } else {
             code += lastOperand;
           }
@@ -111,9 +123,10 @@ export class JavaCodeGenerator extends CodeGenerator {
 
     return code;
   }
-  initializeVariables(): string {
+  initializeVariables(indentationLevel: number): string {
     let code = "";
     this.variables.entries().forEach((entry) => {
+      code += `${"\t".repeat(indentationLevel)}`;
       switch (entry[1].getVarType()) {
         case DataType.Character:
           code +=
