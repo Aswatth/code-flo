@@ -22,8 +22,10 @@ import React, { useCallback, useRef, useState } from "react";
 import StartNode from "./(nodes)/startNode/page";
 import PrintNode from "./(nodes)/printNode/page";
 import {
+  CFNode,
   CFOperationNode,
   CFPrintNode,
+  CFSetVariableNode,
   CFStartNode,
   CFVariableNode,
 } from "./(utils)/nodes";
@@ -86,7 +88,7 @@ export default function Home() {
       } else if (
         (sourceCfNode instanceof CFVariableNode ||
           sourceCfNode instanceof CFOperationNode) &&
-        targetCfNode instanceof CFVariableNode &&
+        targetCfNode instanceof CFSetVariableNode &&
         connectionState.targetHandle == "set"
       ) {
         targetCfNode.setVarValue(sourceCfNode);
@@ -183,17 +185,59 @@ export default function Home() {
 
   const onVariableDelete = useCallback(
     (deletedId: string) => {
-      const edge = edges.find(
+      // Set next incoming source node's next node to NULL
+      const incomingEdges = edges.filter((f) =>
+        f.target.startsWith("SET-" + deletedId)
+      );
+      incomingEdges.forEach((f) => {
+        nodes
+          .filter((n) => n.id.startsWith(f.source))
+          .forEach((e) => {
+            (e.data.cfNodeData as CFNode).setNextNode(null);
+          });
+      });
+
+      //Variable node connected to print node
+      let edge = edges.find(
         (f) => f.source.startsWith(deletedId) && f.target.startsWith("PRINT")
       );
-
       if (edge) {
         const printNode = nodes.find((f) => f.id == edge.target)?.data
           .cfNodeData as CFPrintNode;
         printNode.setMessage("");
       }
 
-      setNodes((nds) => nds.filter((f) => !f.id.startsWith(deletedId)));
+      // Variable node connected to operation node
+      edge = edges.find(
+        (f) =>
+          f.source.startsWith(deletedId) && f.target.startsWith("OPERATION")
+      );
+      if (edge) {
+        const operationNode = nodes.find((f) => f.id == edge.target)?.data
+          .cfNodeData as CFOperationNode;
+        const indexToUpdate = parseInt(edge.targetHandle.split("$")[1]);
+        operationNode.updateOperand(indexToUpdate, "");
+      }
+
+      // Delete all variable and set-variable nodes for the given id.
+      setNodes((nds) =>
+        nds.filter(
+          (f) =>
+            !f.id.startsWith(deletedId) &&
+            !f.id.startsWith("SET-" + deletedId)
+        )
+      );
+
+      // Delete all edges to and from variable and set-variable nodes.
+      setEdges((edges) =>
+        edges.filter(
+          (edge) =>
+            !edge.source.startsWith(deletedId) &&
+            !edge.target.startsWith(deletedId) &&
+            !edge.source.startsWith("SET-" + deletedId) &&
+            !edge.target.startsWith("SET-" + deletedId)
+        )
+      );
     },
     [nodes, edges]
   );
@@ -210,18 +254,19 @@ export default function Home() {
   const onReconnectEnd = useCallback(
     (_: any, edge: Edge) => {
       if (!edgeReconnectSuccessful.current) {
-        const node = nodes.find((f) => f.id == edge.source);
         if (
           (edge.source.startsWith("VARIABLE") ||
             edge.source.startsWith("OPERATION")) &&
-          edge.target.startsWith("PRINT")
+          edge.target.startsWith("PRINT") &&
+          edge.targetHandle == "printValue"
         ) {
           const printNode = nodes.find((f) => f.id == edge.target);
           (printNode?.data.cfNodeData as CFPrintNode).setMessage("");
         } else if (
           (edge.source.startsWith("VARIABLE") ||
             edge.source.startsWith("OPERATION")) &&
-          edge.target.startsWith("SET")
+          edge.target.startsWith("SET-") &&
+          edge.targetHandle == "set"
         ) {
           const variableNode = nodes.find((f) => f.id == edge.target);
           (variableNode?.data.cfNodeData as CFVariableNode).setVarValue("");
@@ -237,6 +282,8 @@ export default function Home() {
             ""
           );
         }
+
+        const node = nodes.find((f) => f.id == edge.source);
         node?.data.cfNodeData.setNextNode(null);
         setEdges((eds) => eds.filter((e) => e.id !== edge.id));
       }

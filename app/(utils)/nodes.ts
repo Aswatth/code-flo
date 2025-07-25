@@ -54,7 +54,6 @@ export class CFPrintNode extends CFNode {
 }
 
 export class CFVariableNode extends CFNode {
-  private varValue: string | CFVariableNode | CFOperationNode;
   constructor(
     id: string,
     private varType: DataType,
@@ -66,7 +65,6 @@ export class CFVariableNode extends CFNode {
     this.varType = varType;
     this.varName = varName;
     this.initialVarValue = initialVarValue;
-    this.varValue = initialVarValue;
   }
   setVarType(type: DataType) {
     this.varType = type;
@@ -76,13 +74,8 @@ export class CFVariableNode extends CFNode {
   }
   setInitialVarValue(value: string) {
     this.initialVarValue = value;
-    if (!(this.varValue instanceof CFVariableNode)) {
-      this.varValue = value;
-    }
   }
-  setVarValue(value: string | CFVariableNode | CFOperationNode) {
-    this.varValue = value;
-  }
+
   getVarType() {
     return this.varType;
   }
@@ -92,6 +85,31 @@ export class CFVariableNode extends CFNode {
   getInitialVarValue() {
     return this.initialVarValue;
   }
+}
+
+export class CFSetVariableNode extends CFNode {
+  private varValue: string | CFVariableNode | CFOperationNode;
+  constructor(
+    id: string,
+    private readonly variableNode: CFVariableNode,
+    nextNode: CFNode | null
+  ) {
+    super(id, "SET-VARIABLE", nextNode);
+    this.varValue = "";
+  }
+
+  getVarName(): string {
+    return this.variableNode.getVarName();
+  }
+
+  getVarType(): DataType {
+    return this.variableNode.getVarType();
+  }
+
+  setVarValue(value: string | CFVariableNode | CFOperationNode) {
+    this.varValue = value;
+  }
+
   getVarValue() {
     return this.varValue;
   }

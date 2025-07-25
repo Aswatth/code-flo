@@ -1,15 +1,15 @@
 import { create } from "zustand";
-import { CFVariableNode } from "../nodes";
+import { CFSetVariableNode, CFVariableNode } from "../nodes";
 
 interface VariableState {
   variables: Map<string,CFVariableNode>,
-  setVariable: (variable: CFVariableNode) => void,
+  updateVariable: (variable: CFVariableNode) => void,
   deleteVariable: (id:string) => void,
 }
 
 export const VariableStore = create<VariableState>((set) => ({
     variables: new Map<string,CFVariableNode>(),
-    setVariable: (variable) => set((state) => {
+    updateVariable: (variable) => set((state) => {
         const map = new Map(state.variables);
         map.set(variable.getId(), variable);
         return {variables: map};
@@ -18,6 +18,27 @@ export const VariableStore = create<VariableState>((set) => ({
         const map = new Map(state.variables);
         map.delete(id);
         return {variables: map};
+    })
+})
+);
+
+interface SetVariableState {
+  setVariablesMap: Map<string,CFSetVariableNode>,
+  updateSetVariable: (variable: CFSetVariableNode) => void,
+  deleteSetVariable: (id:string) => void,
+}
+
+export const SetVariableStore = create<SetVariableState>((set) => ({
+    setVariablesMap: new Map<string,CFSetVariableNode>(),
+    updateSetVariable: (variable) => set((state) => {
+        const map = new Map(state.setVariablesMap);
+        map.set(variable.getId(), variable);
+        return {setVariablesMap: map};
+    }),
+    deleteSetVariable: (id) => set((state) => {
+        const map = new Map(state.setVariablesMap);
+        map.delete(id);
+        return {setVariablesMap: map};
     })
 })
 );

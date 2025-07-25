@@ -12,11 +12,11 @@ type VariableSpaceProps = {
 };
 
 export default function VariableSpace({ onDelete }: VariableSpaceProps) {
-  const { variables, setVariable } = VariableStore();
+  const { variables, updateVariable } = VariableStore();
 
   const handleAddVariable = () => {
     const nodeId = "VARIABLE-" + new Date().toISOString();
-    setVariable(new CFVariableNode(nodeId, DataType.Integer, "", "", null));
+    updateVariable(new CFVariableNode(nodeId, DataType.Integer, "", "", null));
   };
 
   return (

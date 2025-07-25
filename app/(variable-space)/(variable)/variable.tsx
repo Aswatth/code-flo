@@ -4,7 +4,10 @@ import { useState } from "react";
 
 import styles from "./page.module.css";
 import { CFVariableNode } from "@/app/(utils)/nodes";
-import { VariableStore } from "@/app/(utils)/(data_stores)/variableStore";
+import {
+  SetVariableStore,
+  VariableStore,
+} from "@/app/(utils)/(data_stores)/variableStore";
 import { MdOutlineDelete } from "react-icons/md";
 import { DataType } from "@/app/(utils)/dataType";
 
@@ -14,7 +17,8 @@ interface VariableProps {
 }
 
 export default function Variable({ cfVariable, onDelete }: VariableProps) {
-  const { setVariable, deleteVariable } = VariableStore();
+  const { updateVariable, deleteVariable } = VariableStore();
+  const { setVariablesMap, updateSetVariable } = SetVariableStore();
 
   const [selectedVariableType, setSelectedVariableType] = useState(
     DataType.Integer
@@ -55,7 +59,21 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               } else {
                 cfVariable.setInitialVarValue("");
               }
-              setVariable(cfVariable);
+              updateVariable(cfVariable);
+
+              //Update set variable nodes
+              const setVariableList = setVariablesMap.entries().filter((f) => {
+                return f[0].split("SET-")[1].startsWith(cfVariable.getId());
+              });
+              console.log(setVariableList);
+              setVariableList.forEach((f) => {
+                if ((e.target.value as DataType) == DataType.Boolean) {
+                  f[1].setVarValue("True");
+                } else {
+                  f[1].setVarValue("");
+                }
+                updateSetVariable(f[1]);
+              });
             }}
           >
             {Object.entries(DataType).map(([key, value]) => (
@@ -77,7 +95,7 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
             value={cfVariable.getVarName()}
             onChange={(e) => {
               cfVariable.setVarName(e.target.value);
-              setVariable(cfVariable);
+              updateVariable(cfVariable);
             }}
           ></input>
         </div>
@@ -102,7 +120,7 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               value={cfVariable.getInitialVarValue()}
               onChange={(e) => {
                 cfVariable.setInitialVarValue(e.target.value);
-                setVariable(cfVariable);
+                updateVariable(cfVariable);
               }}
             ></input>
           ) : (
@@ -110,7 +128,7 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               value={cfVariable.getInitialVarValue()}
               onChange={(e) => {
                 cfVariable.setInitialVarValue(e.target.value);
-                setVariable(cfVariable);
+                updateVariable(cfVariable);
               }}
             >
               <option value={"True"}>True</option>

@@ -9,7 +9,10 @@ import { PythonCodeGenerator } from "../(utils)/code-generators/pythonCodeGenera
 import { CFStartNode } from "../(utils)/nodes";
 import { Edge } from "@xyflow/react";
 import { RFNodeData, startNodeId } from "../(utils)/globals";
-import { VariableStore } from "../(utils)/(data_stores)/variableStore";
+import {
+  SetVariableStore,
+  VariableStore,
+} from "../(utils)/(data_stores)/variableStore";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
@@ -23,6 +26,7 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
   const { fileName } = fileNameStore();
   const [code, setCode] = useState("");
   const { variables } = VariableStore();
+  const { setVariablesMap } = SetVariableStore();
 
   useEffect(() => {
     const startNode = nodes.find((f) => f.id == startNodeId)?.data
@@ -35,7 +39,7 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
       codeGenerator = new PythonCodeGenerator(variables);
       setCode(codeGenerator.generateCode(startNode, 0));
     }
-  }, [fileName, language, variables, nodes, edges]);
+  }, [fileName, language, variables, setVariablesMap, nodes, edges]);
 
   const handleDownload = () => {
     const blob = new Blob([code]);

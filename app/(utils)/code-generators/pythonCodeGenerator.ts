@@ -1,5 +1,11 @@
 import { DataType } from "../dataType";
-import { CFNode, CFOperationNode, CFPrintNode, CFVariableNode } from "../nodes";
+import {
+  CFNode,
+  CFOperationNode,
+  CFPrintNode,
+  CFSetVariableNode,
+  CFVariableNode,
+} from "../nodes";
 import { CodeGenerator } from "./codeGenerator";
 
 export class PythonCodeGenerator extends CodeGenerator {
@@ -35,8 +41,8 @@ export class PythonCodeGenerator extends CodeGenerator {
           }
           break;
         }
-        case "VARIABLE": {
-          let variableNode = node as CFVariableNode;
+        case "SET-VARIABLE": {
+          let variableNode = node as CFSetVariableNode;
           code += variableNode.getVarName() + " = ";
 
           if (variableNode.getVarValue() instanceof CFVariableNode) {

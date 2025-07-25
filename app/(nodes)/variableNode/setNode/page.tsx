@@ -1,8 +1,8 @@
 import styles from "./page.module.css";
 import { Handle, Position } from "@xyflow/react";
-import { CFVariableNode } from "@/app/(utils)/nodes";
+import { CFSetVariableNode, CFVariableNode } from "@/app/(utils)/nodes";
 import { DataType } from "@/app/(utils)/dataType";
-import { VariableStore } from "@/app/(utils)/(data_stores)/variableStore";
+import { SetVariableStore } from "@/app/(utils)/(data_stores)/variableStore";
 import { ChangeEvent } from "react";
 
 type SetNodeProps = {
@@ -10,10 +10,10 @@ type SetNodeProps = {
 };
 
 export default function SetNode({ data }: SetNodeProps) {
-  const { setVariable } = VariableStore();
+  const { updateSetVariable } = SetVariableStore();
 
   function inputField() {
-    const variableNodeData = data.cfNodeData as CFVariableNode;
+    const variableNodeData = data.cfNodeData as CFSetVariableNode;
     const variableType = variableNodeData.getVarType();
 
     if (typeof variableNodeData.getVarValue() === "string") {
@@ -21,7 +21,7 @@ export default function SetNode({ data }: SetNodeProps) {
         e: ChangeEvent<HTMLSelectElement | HTMLInputElement>
       ) => {
         variableNodeData.setVarValue(e.target.value);
-        setVariable(variableNodeData);
+        updateSetVariable(variableNodeData);
       };
 
       if (
@@ -55,7 +55,13 @@ export default function SetNode({ data }: SetNodeProps) {
           </select>
         );
       } else {
-        return <input type="text" onChange={handleInputChange}></input>;
+        return (
+          <input
+            type="text"
+            value={variableNodeData.getVarValue() as string}
+            onChange={handleInputChange}
+          ></input>
+        );
       }
     }
   }

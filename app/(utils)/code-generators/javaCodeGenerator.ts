@@ -3,6 +3,7 @@ import {
   CFNode,
   CFOperationNode,
   CFPrintNode,
+  CFSetVariableNode,
   CFStartNode,
   CFVariableNode,
 } from "../nodes";
@@ -56,8 +57,8 @@ export class JavaCodeGenerator extends CodeGenerator {
           }
           break;
         }
-        case "VARIABLE": {
-          let variableNode = node as CFVariableNode;
+        case "SET-VARIABLE": {
+          let variableNode = node as CFSetVariableNode;
           code += indentation + variableNode.getVarName() + " = ";
 
           if (variableNode.getVarValue() instanceof CFVariableNode) {
