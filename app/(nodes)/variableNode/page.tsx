@@ -1,6 +1,7 @@
 import styles from "./page.module.css";
 import { Handle, Position } from "@xyflow/react";
 import { CFVariableNode } from "@/app/(utils)/nodes";
+import { getPinColor } from "@/app/(utils)/dataType";
 
 type VariableNodeProps = {
   readonly data: any;
@@ -14,7 +15,14 @@ export default function VariableNode({ data }: VariableNodeProps) {
         type="source"
         position={Position.Right}
         isConnectable={true}
-        className={styles.handle}
+        style={{
+          width: "12px",
+          height: "12px",
+          border: "1px solid black",
+          backgroundColor: getPinColor(
+            (data.cfNodeData as CFVariableNode).getVarType()
+          ),
+        }}
       />
     </div>
   );

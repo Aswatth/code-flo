@@ -1,7 +1,7 @@
 import styles from "./page.module.css";
 import { Handle, Position } from "@xyflow/react";
 import { CFSetVariableNode, CFVariableNode } from "@/app/(utils)/nodes";
-import { DataType } from "@/app/(utils)/dataType";
+import { DataType, getPinColor } from "@/app/(utils)/dataType";
 import { SetVariableStore } from "@/app/(utils)/(data_stores)/variableStore";
 import { ChangeEvent } from "react";
 
@@ -90,6 +90,11 @@ export default function SetNode({ data }: SetNodeProps) {
           position={Position.Left}
           isConnectable={true}
           className={styles.variableHandle}
+          style={{
+            backgroundColor: getPinColor(
+              (data.cfNodeData as CFVariableNode).getVarType()
+            ),
+          }}
         />
 
         {inputField()}
