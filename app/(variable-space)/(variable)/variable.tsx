@@ -65,14 +65,16 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               const setVariableList = setVariablesMap.entries().filter((f) => {
                 return f[0].split("SET-")[1].startsWith(cfVariable.getId());
               });
-              console.log(setVariableList);
+
               setVariableList.forEach((f) => {
-                if ((e.target.value as DataType) == DataType.Boolean) {
-                  f[1].setVarValue("True");
-                } else {
-                  f[1].setVarValue("");
+                if (typeof f[1].getVarValue() === "string") {
+                  if ((e.target.value as DataType) == DataType.Boolean) {
+                    f[1].setVarValue("True");
+                  } else {
+                    f[1].setVarValue("");
+                  }
+                  updateSetVariable(f[1]);
                 }
-                updateSetVariable(f[1]);
               });
             }}
           >
