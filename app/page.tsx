@@ -322,19 +322,6 @@ export default function Home() {
         <Controls />
         <MiniMap />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        <div className={styles.fileName}>
-          <input
-            type="text"
-            placeholder="Filename"
-            value={fileName}
-            onChange={(e) => {
-              const startNode = nodes.find((f) => f.id == startNodeId)?.data
-                .cfNodeData! as CFStartNode;
-              startNode.setFileName(e.target.value);
-              setFileName(e.target.value);
-            }}
-          ></input>
-        </div>
         {menu && <ContextMenu onClick={onPaneClick} {...menu} />}
         {paneMenu && <PaneContextMenu onClick={onPaneClick} {...paneMenu} />}
       </ReactFlow>

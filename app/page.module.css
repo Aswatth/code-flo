@@ -16,19 +16,6 @@
   flex: 1;
 }
 
-.fileName {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.fileName input {
-  border-radius: 12px;
-  border: 1px solid black;
-  padding: 10px;
-}
-
 .addNodeButton {
   position: absolute;
   left: 50%;

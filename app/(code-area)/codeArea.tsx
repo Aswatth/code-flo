@@ -23,7 +23,7 @@ type CodeAreaProps = {
 
 export default function CodeArea({ nodes, edges }: CodeAreaProps) {
   const { language, fileExtension, setLanguage } = languageStore();
-  const { fileName } = fileNameStore();
+  const { fileName, setFileName } = fileNameStore();
   const [code, setCode] = useState("");
   const { variables } = VariableStore();
   const { setVariablesMap } = SetVariableStore();
@@ -59,16 +59,32 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
 
   return (
     <div className={styles.page}>
-      <select
-        value={language}
-        className={styles.languageOption}
-        onChange={(e) => setLanguage(e.target.value)}
-      >
-        <option>Java</option>
-        <option>Python</option>
-        <option>Javascript</option>
-        <option>Go</option>
-      </select>
+      <div className={styles.options}>
+        <div className={styles.fileName}>
+          <input
+            type="text"
+            placeholder="Filename"
+            value={fileName}
+            style={{ padding: "5px" }}
+            onChange={(e) => {
+              const startNode = nodes.find((f) => f.id == startNodeId)?.data
+                .cfNodeData! as CFStartNode;
+              startNode.setFileName(e.target.value);
+              setFileName(e.target.value);
+            }}
+          ></input>
+        </div>
+        <select
+          value={language}
+          style={{ padding: "5px" }}
+          onChange={(e) => setLanguage(e.target.value)}
+        >
+          <option>Java</option>
+          <option>Python</option>
+          <option>Javascript</option>
+          <option>Go</option>
+        </select>
+      </div>
       <SyntaxHighlighter
         language={language.toLowerCase()}
         showLineNumbers={true}
