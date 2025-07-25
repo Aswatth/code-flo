@@ -14,6 +14,107 @@ export class JavaCodeGenerator extends CodeGenerator {
     super();
     this.variables = variables;
   }
+
+  generatePrintStatement(
+    printNode: CFPrintNode,
+    indentationLevel: number
+  ): string {
+    let code: string = "";
+    let indentation = "\t".repeat(indentationLevel);
+    if (printNode.getMessage() instanceof CFOperationNode) {
+      code +=
+        indentation +
+        "System.out.println(" +
+        this.generateCode(
+          printNode.getMessage() as CFOperationNode,
+          indentationLevel
+        ) +
+        ");\n";
+    } else if (printNode.getMessage() instanceof CFVariableNode) {
+      code +=
+        indentation +
+        "System.out.println(" +
+        (printNode.getMessage() as CFVariableNode).getVarName() +
+        ");\n";
+    } else {
+      code +=
+        indentation +
+        'System.out.println("' +
+        (printNode.getMessage() as string) +
+        '");\n';
+    }
+    return code;
+  }
+
+  generateSetVariableStatement(
+    variableNode: CFSetVariableNode,
+    indentationLevel: number
+  ): string {
+    let code: string = "";
+    let indentation = "\t".repeat(indentationLevel);
+    code += indentation + variableNode.getVarName() + " = ";
+
+    if (variableNode.getVarValue() instanceof CFVariableNode) {
+      code += (variableNode.getVarValue() as CFVariableNode).getVarName();
+    } else if (variableNode.getVarValue() instanceof CFOperationNode) {
+      code += this.generateCode(
+        variableNode.getVarValue() as CFOperationNode,
+        indentationLevel
+      );
+    } else {
+      switch (variableNode.getVarType()) {
+        case DataType.Character:
+          code += "'" + (variableNode.getVarValue() as string) + "'";
+          break;
+        case DataType.String:
+          code += '"' + (variableNode.getVarValue() as string) + '"';
+          break;
+        case DataType.Decimal:
+          code += (variableNode.getVarValue() as string) + "f";
+          break;
+        default:
+          code += (variableNode.getVarValue() as string).toLowerCase();
+          break;
+      }
+    }
+
+    code += ";\n";
+    return code;
+  }
+
+  generateOperationStatement(
+    operationNode: CFOperationNode,
+    indentationLevel: number
+  ) {
+    let code: string = "";
+    const operands = operationNode.getOperands();
+    const lastOperand = operands[operands.length - 1];
+
+    code += "(";
+    for (let i = 0; i < operands.length - 1; ++i) {
+      if (operands[i] instanceof CFVariableNode) {
+        code += (operands[i] as CFVariableNode).getVarName();
+      } else if (operands[i] instanceof CFOperationNode) {
+        code += this.generateCode(
+          operands[i] as CFOperationNode,
+          indentationLevel
+        );
+      } else {
+        code += operands[i] as string;
+      }
+      code += operationNode.getOperator();
+    }
+    if (lastOperand instanceof CFVariableNode) {
+      code += lastOperand.getVarName();
+    } else if (lastOperand instanceof CFOperationNode) {
+      code += this.generateCode(lastOperand, indentationLevel);
+    } else {
+      code += lastOperand;
+    }
+    code += ")";
+    return code;
+  }
+
   generateCode(node: CFNode | null, indentationLevel: number): string {
     let code = "";
 
@@ -32,89 +133,24 @@ export class JavaCodeGenerator extends CodeGenerator {
           return code;
         }
         case "PRINT": {
-          let printNode = node as CFPrintNode;
-          if (printNode.getMessage() instanceof CFOperationNode) {
-            code +=
-              indentation +
-              "System.out.println(" +
-              this.generateCode(
-                printNode.getMessage() as CFOperationNode,
-                indentationLevel
-              ) +
-              ");\n";
-          } else if (printNode.getMessage() instanceof CFVariableNode) {
-            code +=
-              indentation +
-              "System.out.println(" +
-              (printNode.getMessage() as CFVariableNode).getVarName() +
-              ");\n";
-          } else {
-            code +=
-              indentation +
-              'System.out.println("' +
-              (printNode.getMessage() as string) +
-              '");\n';
-          }
+          code += this.generatePrintStatement(
+            node as CFPrintNode,
+            indentationLevel
+          );
           break;
         }
         case "SET-VARIABLE": {
-          let variableNode = node as CFSetVariableNode;
-          code += indentation + variableNode.getVarName() + " = ";
-
-          if (variableNode.getVarValue() instanceof CFVariableNode) {
-            code += (variableNode.getVarValue() as CFVariableNode).getVarName();
-          } else if (variableNode.getVarValue() instanceof CFOperationNode) {
-            code += this.generateCode(
-              variableNode.getVarValue() as CFOperationNode,
-              indentationLevel
-            );
-          } else {
-            switch (variableNode.getVarType()) {
-              case DataType.Character:
-                code += "'" + (variableNode.getVarValue() as string) + "'";
-                break;
-              case DataType.String:
-                code += '"' + (variableNode.getVarValue() as string) + '"';
-                break;
-              case DataType.Decimal:
-                code += (variableNode.getVarValue() as string) + "f";
-                break;
-              default:
-                code += (variableNode.getVarValue() as string).toLowerCase();
-                break;
-            }
-          }
-
-          code += ";\n";
+          code += this.generateSetVariableStatement(
+            node as CFSetVariableNode,
+            indentationLevel
+          );
           break;
         }
         case "OPERATION": {
-          const operationNode = node as CFOperationNode;
-          const operands = operationNode.getOperands();
-          const lastOperand = operands[operands.length - 1];
-
-          code += "(";
-          for (let i = 0; i < operands.length - 1; ++i) {
-            if (operands[i] instanceof CFVariableNode) {
-              code += (operands[i] as CFVariableNode).getVarName();
-            } else if (operands[i] instanceof CFOperationNode) {
-              code += this.generateCode(
-                operands[i] as CFOperationNode,
-                indentationLevel
-              );
-            } else {
-              code += operands[i] as string;
-            }
-            code += operationNode.getOperator();
-          }
-          if (lastOperand instanceof CFVariableNode) {
-            code += lastOperand.getVarName();
-          } else if (lastOperand instanceof CFOperationNode) {
-            code += this.generateCode(lastOperand, indentationLevel);
-          } else {
-            code += lastOperand;
-          }
-          code += ")";
+          code += this.generateOperationStatement(
+            node as CFOperationNode,
+            indentationLevel
+          );
           break;
         }
       }
