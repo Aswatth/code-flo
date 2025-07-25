@@ -5,6 +5,7 @@ import { CFOperationNode } from "@/app/(utils)/nodes";
 import { IoIosAddCircle } from "react-icons/io";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
+import { Operator } from "@/app/(utils)/operator";
 
 type OperationNodeProps = {
   readonly data: any;
@@ -15,15 +16,15 @@ export default function OperationNode({ data }: OperationNodeProps) {
 
   function getOperationName(): string {
     switch ((data.cfNodeData as CFOperationNode).getOperator()) {
-      case "+":
+      case Operator.ADD:
         return "ADD";
-      case "-":
+      case Operator.SUBTRACT:
         return "SUBTRACT";
-      case "*":
+      case Operator.MULTIPLY:
         return "MULTIPLY";
-      case "/":
+      case Operator.DIVIDE:
         return "DIVIDE";
-      case "%":
+      case Operator.MODULUS:
         return "MODULUS";
       default:
         return "ADD";
