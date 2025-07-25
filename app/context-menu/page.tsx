@@ -48,7 +48,7 @@ export default function ContextMenu({
       (f) => f.source.startsWith(id) && f.target.startsWith("OPERATION")
     );
     if (edge) {
-      const operationNode = nodes.find((f) => f.id == edge.target)?.data
+      const operationNode = nodes.find((f) => f.id == edge!.target)?.data
         .cfNodeData as CFOperationNode;
       const indexToDelete = parseInt(edge.targetHandle?.split("$")[1]!);
       operationNode.updateOperand(indexToDelete, "");

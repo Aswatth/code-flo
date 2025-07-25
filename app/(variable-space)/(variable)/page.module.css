@@ -8,6 +8,7 @@
   margin-bottom: 10px;
   user-select: none;
   position: relative;
+  list-style: none;
 }
 
 .content {
@@ -29,6 +30,8 @@
   top: 10;
   right: 10;
   color: black;
+  background: transparent;
+  border: none;
 }
 
 .deleteButton:hover {

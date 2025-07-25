@@ -36,19 +36,21 @@ export class CFStartNode extends CFNode {
   }
 }
 
+type MessageType = string | CFOperationNode | CFVariableNode;
+
 export class CFPrintNode extends CFNode {
   constructor(
     id: string,
-    private message: CFOperationNode | CFVariableNode | string,
+    private message: MessageType,
     nextNode: CFNode | null
   ) {
     super(id, "PRINT", nextNode);
     this.message = message;
   }
-  setMessage(message: CFOperationNode | CFVariableNode | string) {
+  setMessage(message: MessageType) {
     this.message = message;
   }
-  getMessage(): CFOperationNode | CFVariableNode | string {
+  getMessage(): MessageType {
     return this.message;
   }
 }
@@ -87,8 +89,9 @@ export class CFVariableNode extends CFNode {
   }
 }
 
+type VarValueType = string | CFVariableNode | CFOperationNode;
 export class CFSetVariableNode extends CFNode {
-  private varValue: string | CFVariableNode | CFOperationNode;
+  private varValue: VarValueType;
   constructor(
     id: string,
     private readonly variableNode: CFVariableNode,
@@ -106,7 +109,7 @@ export class CFSetVariableNode extends CFNode {
     return this.variableNode.getVarType();
   }
 
-  setVarValue(value: string | CFVariableNode | CFOperationNode) {
+  setVarValue(value: VarValueType) {
     this.varValue = value;
   }
 
@@ -119,7 +122,7 @@ export class CFOperationNode extends CFNode {
   constructor(
     id: string,
     private readonly operator: Operator,
-    private operands: (CFOperationNode | CFVariableNode | string)[],
+    private operands: VarValueType[],
     nextNode: CFNode | null
   ) {
     super(id, "OPERATION", nextNode);
@@ -133,19 +136,16 @@ export class CFOperationNode extends CFNode {
   getOperator() {
     return this.operator;
   }
-  addOperand(operand: CFOperationNode | CFVariableNode | string) {
+  addOperand(operand: VarValueType) {
     this.operands.push(operand);
   }
-  updateOperand(
-    index: number,
-    operand: CFOperationNode | CFVariableNode | string
-  ) {
+  updateOperand(index: number, operand: VarValueType) {
     this.operands[index] = operand;
   }
   removeOperand(indexToRemove: number) {
     this.operands.splice(indexToRemove, 1);
   }
-  setOperands(operands: (CFOperationNode | CFVariableNode | string)[]) {
+  setOperands(operands: VarValueType[]) {
     this.operands = operands;
   }
 }

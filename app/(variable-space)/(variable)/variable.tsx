@@ -38,7 +38,7 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
   };
 
   return (
-    <button
+    <li
       draggable
       className={styles.variable}
       onDragStart={(event) => onDragStart(event, "variableNode")}
@@ -139,14 +139,10 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
           )}
         </div>
 
-        <div
-          role="button"
-          className={styles.deleteButton}
-          onClick={handleDelete}
-        >
+        <button className={styles.deleteButton} onClick={handleDelete}>
           <MdOutlineDelete />
-        </div>
+        </button>
       </div>
-    </button>
+    </li>
   );
 }

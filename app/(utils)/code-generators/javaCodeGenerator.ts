@@ -103,7 +103,7 @@ export class JavaCodeGenerator extends CodeGenerator {
                 indentationLevel
               );
             } else {
-              code += operands[i];
+              code += operands[i] as string;
             }
             code += operationNode.getOperator();
           }

@@ -223,8 +223,7 @@ export default function Home() {
       setNodes((nds) =>
         nds.filter(
           (f) =>
-            !f.id.startsWith(deletedId) &&
-            !f.id.startsWith("SET-" + deletedId)
+            !f.id.startsWith(deletedId) && !f.id.startsWith("SET-" + deletedId)
         )
       );
 
@@ -269,7 +268,7 @@ export default function Home() {
           edge.targetHandle == "set"
         ) {
           const variableNode = nodes.find((f) => f.id == edge.target);
-          (variableNode?.data.cfNodeData as CFVariableNode).setVarValue("");
+          (variableNode?.data.cfNodeData as CFSetVariableNode).setVarValue("");
         } else if (
           (edge.source.startsWith("VARIABLE") ||
             edge.source.startsWith("OPERATION")) &&

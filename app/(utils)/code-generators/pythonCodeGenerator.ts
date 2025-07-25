@@ -79,7 +79,7 @@ export class PythonCodeGenerator extends CodeGenerator {
             } else if (operands[i] instanceof CFOperationNode) {
               code += this.generateCode(operands[i] as CFOperationNode);
             } else {
-              code += operands[i];
+              code += operands[i] as string;
             }
             code += operationNode.getOperator();
           }
