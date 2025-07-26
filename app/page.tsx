@@ -36,7 +36,7 @@ import VariableNode from "./(nodes)/variableNode/page";
 import { VariableStore } from "./(utils)/(data_stores)/variableStore";
 import PaneContextMenu from "./pane-context-menu/page";
 import OperationNode from "./(nodes)/operationNode/page";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import SetNode from "./(nodes)/variableNode/setNode/page";
 
 export default function Home() {
@@ -103,7 +103,16 @@ export default function Home() {
         targetCfNode.updateOperand(indexToUpdate, sourceCfNode);
       }
 
-      setEdges((edge) => addEdge(connectionState, edge));
+      if (
+        (connectionState.sourceHandle == null &&
+          connectionState.targetHandle != null) ||
+        (connectionState.sourceHandle != null &&
+          connectionState.targetHandle == null)
+      ) {
+        toast.error("Cannot connect execution pin to value pin");
+      } else {
+        setEdges((edge) => addEdge(connectionState, edge));
+      }
     },
     [nodes, setEdges]
   );

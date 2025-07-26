@@ -15,6 +15,7 @@ export default function VariableNode({ data }: VariableNodeProps) {
         type="source"
         position={Position.Right}
         isConnectable={true}
+        id={(data.cfNodeData as CFVariableNode).getId()}
         style={{
           width: "12px",
           height: "12px",

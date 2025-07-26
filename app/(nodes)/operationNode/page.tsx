@@ -93,6 +93,7 @@ export default function OperationNode({ data }: OperationNodeProps) {
       })}
       <Handle
         type="source"
+        id={data.cfNodeData.getId()}
         position={Position.Right}
         isConnectable={true}
         style={{ width: "12px", height: "12px" }}
