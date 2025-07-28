@@ -119,6 +119,8 @@ export class CFSetVariableNode extends CFNode {
 }
 
 export class CFOperationNode extends CFNode {
+  private outputDataType: DataType;
+  private operandDataTypeMap: Map<DataType, number>;
   constructor(
     id: string,
     private readonly operator: Operator,
@@ -128,6 +130,11 @@ export class CFOperationNode extends CFNode {
     super(id, "OPERATION", nextNode);
     this.operator = operator;
     this.operands = operands;
+    this.outputDataType = DataType.Integer;
+    this.operandDataTypeMap = new Map<DataType, number>([
+      [DataType.Integer, 0],
+      [DataType.Decimal, 0],
+    ]);
   }
 
   getOperands() {
@@ -136,16 +143,60 @@ export class CFOperationNode extends CFNode {
   getOperator() {
     return this.operator;
   }
+  getOutputDataType(): DataType {
+    if (this.operandDataTypeMap.get(DataType.Decimal) == 0) {
+      return DataType.Integer;
+    } else {
+      return DataType.Decimal;
+    }
+  }
+
+  private updateDataTypeMap(operand: VarValueType, valueToUpdate: number) {
+    if (typeof operand === "string") {
+      console.log(operand);
+      if (operand.includes(".") || operand.includes("e")) {
+        let currCount: number = this.operandDataTypeMap.get(DataType.Decimal)!;
+        this.operandDataTypeMap.set(
+          DataType.Decimal,
+          currCount + valueToUpdate
+        );
+      } else {
+        let currCount: number = this.operandDataTypeMap.get(DataType.Integer)!;
+        this.operandDataTypeMap.set(
+          DataType.Integer,
+          currCount + valueToUpdate
+        );
+      }
+    } else if (operand instanceof CFVariableNode) {
+      console.log("Here");
+      let currCount: number = this.operandDataTypeMap.get(
+        operand.getVarType()
+      )!;
+      this.operandDataTypeMap.set(
+        operand.getVarType(),
+        currCount + valueToUpdate
+      );
+    } else if (operand instanceof CFOperationNode) {
+      let currCount: number = this.operandDataTypeMap.get(
+        operand.getOutputDataType()
+      )!;
+      this.operandDataTypeMap.set(
+        operand.getOutputDataType(),
+        currCount + valueToUpdate
+      );
+    }
+  }
   addOperand(operand: VarValueType) {
+    this.updateDataTypeMap(operand, 1);
     this.operands.push(operand);
   }
   updateOperand(index: number, operand: VarValueType) {
+    this.updateDataTypeMap(this.operands[index], -1);
     this.operands[index] = operand;
+    this.updateDataTypeMap(this.operands[index], 1);
   }
   removeOperand(indexToRemove: number) {
+    this.updateDataTypeMap(this.operands[indexToRemove], -1);
     this.operands.splice(indexToRemove, 1);
-  }
-  setOperands(operands: VarValueType[]) {
-    this.operands = operands;
   }
 }

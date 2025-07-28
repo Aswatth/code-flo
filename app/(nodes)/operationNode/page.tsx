@@ -6,6 +6,11 @@ import { IoIosAddCircle } from "react-icons/io";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import toast from "react-hot-toast";
 import { Operator } from "@/app/(utils)/operator";
+import {
+  DataType,
+  DataTypePinColor,
+  getPinColor,
+} from "@/app/(utils)/dataType";
 
 type OperationNodeProps = {
   readonly data: any;
@@ -46,8 +51,10 @@ export default function OperationNode({ data }: OperationNodeProps) {
                 position={Position.Left}
                 isConnectable={true}
                 id={data.cfNodeData.getId() + "$" + idx}
-                style={{ width: "12px", height: "12px" }}
-                className={styles.operandsHandle}
+                style={{
+                  position: "relative",
+                }}
+                className={styles.inputHandle}
               />
               <input
                 value={m.toString()}
@@ -84,8 +91,11 @@ export default function OperationNode({ data }: OperationNodeProps) {
                 position={Position.Left}
                 isConnectable={true}
                 id={data.cfNodeData.getId() + "$" + idx}
-                style={{ width: "12px", height: "12px" }}
-                className={styles.operandsHandle}
+                style={{
+                  position: "relative",
+                  background: getPinColor(DataType.Integer),
+                }}
+                className={styles.inputHandle}
               />
             </div>
           );
@@ -96,8 +106,12 @@ export default function OperationNode({ data }: OperationNodeProps) {
         id={data.cfNodeData.getId()}
         position={Position.Right}
         isConnectable={true}
-        style={{ width: "12px", height: "12px" }}
         className={styles.handle}
+        style={{
+          background: getPinColor(
+            (data.cfNodeData as CFOperationNode).getOutputDataType()
+          ),
+        }}
       />
       <div className={styles.addOperand}>
         <button

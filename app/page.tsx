@@ -112,6 +112,32 @@ export default function Home() {
       }
     }
 
+    // Operation to set-variable node
+    if (
+      connection.source.startsWith("OPERATION") &&
+      connection.target.startsWith("SET-") &&
+      connection.targetHandle == "set"
+    ) {
+      const sourceCfNode = nodes.find((f) => f.id == connection.source)?.data
+        .cfNodeData as CFOperationNode;
+      const targetCfNode = nodes.find((f) => f.id == connection.target)?.data
+        .cfNodeData as CFSetVariableNode;
+
+      if (sourceCfNode.getOutputDataType() != targetCfNode.getVarType()) {
+        toast.error((t) => (
+          <div>
+            <p>
+              <b>Error</b>
+            </p>
+            <p>
+              {`Expected ${targetCfNode.getVarType()} but got ${sourceCfNode.getOutputDataType()}`}
+            </p>
+          </div>
+        ));
+        return false;
+      }
+    }
+
     // Variable to operation node.
     if (
       connection.source.startsWith("VARIABLE") &&
@@ -132,6 +158,33 @@ export default function Home() {
             </p>
             <p>
               {`Expected Integer or Decimal but got ${sourceCfNode.getVarType()}`}
+            </p>
+          </div>
+        ));
+        return false;
+      }
+    }
+
+    // Operation to operation node.
+    if (
+      connection.source.startsWith("OPERATION") &&
+      connection.target.startsWith("OPERATION") &&
+      connection.targetHandle?.startsWith("OPERATION")
+    ) {
+      const sourceCfNode = nodes.find((f) => f.id == connection.source)?.data
+        .cfNodeData as CFOperationNode;
+
+      if (
+        sourceCfNode.getOutputDataType() != DataType.Integer &&
+        sourceCfNode.getOutputDataType() != DataType.Decimal
+      ) {
+        toast.error((t) => (
+          <div>
+            <p>
+              <b>Error</b>
+            </p>
+            <p>
+              {`Expected Integer or Decimal but got ${sourceCfNode.getOutputDataType()}`}
             </p>
           </div>
         ));
