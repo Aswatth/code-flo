@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import { Operator } from "@/app/(utils)/operator";
 import {
   DataType,
-  DataTypePinColor,
   getPinColor,
 } from "@/app/(utils)/dataType";
 

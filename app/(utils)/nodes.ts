@@ -119,8 +119,7 @@ export class CFSetVariableNode extends CFNode {
 }
 
 export class CFOperationNode extends CFNode {
-  private outputDataType: DataType;
-  private operandDataTypeMap: Map<DataType, number>;
+  private readonly operandDataTypeMap: Map<DataType, number>;
   constructor(
     id: string,
     private readonly operator: Operator,
@@ -130,7 +129,6 @@ export class CFOperationNode extends CFNode {
     super(id, "OPERATION", nextNode);
     this.operator = operator;
     this.operands = operands;
-    this.outputDataType = DataType.Integer;
     this.operandDataTypeMap = new Map<DataType, number>([
       [DataType.Integer, 0],
       [DataType.Decimal, 0],
