@@ -9,7 +9,8 @@ import {
   VariableStore,
 } from "@/app/(utils)/(data_stores)/variableStore";
 import { MdOutlineDelete } from "react-icons/md";
-import { DataType } from "@/app/(utils)/dataType";
+import { DataType, getPinColor } from "@/app/(utils)/dataType";
+import toast from "react-hot-toast";
 
 interface VariableProps {
   readonly cfVariable: CFVariableNode;
@@ -17,7 +18,7 @@ interface VariableProps {
 }
 
 export default function Variable({ cfVariable, onDelete }: VariableProps) {
-  const { updateVariable, deleteVariable } = VariableStore();
+  const { variables, updateVariable, deleteVariable } = VariableStore();
   const { setVariablesMap, updateSetVariable } = SetVariableStore();
 
   const [selectedVariableType, setSelectedVariableType] = useState(
@@ -25,10 +26,16 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
   );
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
-    event.dataTransfer.setData(
-      "application/code-flo",
-      JSON.stringify({ nodeType: nodeType, varId: cfVariable.getId() })
-    );
+    if (cfVariable.getVarName().length == 0) {
+      toast.error("Variable name cannot be empty.");
+      event.dataTransfer.setData("application/code-flo", JSON.stringify(null));
+    } else {
+      event.dataTransfer.setData(
+        "application/code-flo",
+        JSON.stringify({ nodeType: nodeType, varId: cfVariable.getId() })
+      );
+    }
+
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -37,6 +44,20 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
     deleteVariable(cfVariable.getId());
   };
 
+  function validateVariableName(value: string) {
+    return /^[a-zA-Z_]+\w*$/.test(value);
+  }
+
+  function isVarNameAlreadyExists(name: string) {
+    let result = false;
+    variables.forEach((m) => {
+      if (m.getId() != cfVariable.getId() && m.getVarName() == name) {
+        result = true;
+      }
+    });
+    return result;
+  }
+
   return (
     <li
       draggable
@@ -44,7 +65,18 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
       onDragStart={(event) => onDragStart(event, "variableNode")}
     >
       <div className={styles.content}>
-        <div className={styles.label}>
+        <div
+          className={styles.label}
+          style={{ display: "flex", alignItems: "center" }}
+        >
+          <div
+            style={{
+              width: "12px",
+              height: "12px",
+              borderRadius: "50%",
+              background: getPinColor(cfVariable.getVarType()),
+            }}
+          ></div>
           <label htmlFor="varType">Type:</label>
         </div>
         <div className={styles.field}>
@@ -55,7 +87,7 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
               setSelectedVariableType(e.target.value as DataType);
               cfVariable.setVarType(e.target.value as DataType);
               if ((e.target.value as DataType) == DataType.Boolean) {
-                cfVariable.setInitialVarValue("True");
+                cfVariable.setInitialVarValue("False");
               } else {
                 cfVariable.setInitialVarValue("");
               }
@@ -95,13 +127,21 @@ export default function Variable({ cfVariable, onDelete }: VariableProps) {
             id="varName"
             type="text"
             value={cfVariable.getVarName()}
+            maxLength={25}
             onChange={(e) => {
-              cfVariable.setVarName(e.target.value);
-              updateVariable(cfVariable);
+              if (validateVariableName(e.target.value)) {
+                cfVariable.setVarName(e.target.value);
+                updateVariable(cfVariable);
+              }
             }}
           ></input>
         </div>
       </div>
+      {isVarNameAlreadyExists(cfVariable.getVarName()) ? (
+        <span className={styles.error}>Variable name already exists</span>
+      ) : (
+        <div></div>
+      )}
       <div className={styles.content}>
         <div className={styles.label}>
           <label htmlFor="varValue">Value:</label>

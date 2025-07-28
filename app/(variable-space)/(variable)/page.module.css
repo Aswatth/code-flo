@@ -13,7 +13,7 @@
 
 .content {
   display: flex;
-  margin-bottom: 10px;
+  padding-block: 10px;
 }
 
 .content .label {
@@ -23,6 +23,14 @@
 .content .field {
   flex: 2;
   border-radius: 10px;
+}
+
+.error {
+  color: red;
+  font-style: italic;
+  font-weight: bold;
+  padding: 0px;
+  margin: 0px;
 }
 
 .deleteButton {
