@@ -127,35 +127,34 @@ export class PythonCodeGenerator extends CodeGenerator {
   initializeVariables(indentationLevel: number): string {
     let code = "";
     this.variables.entries().forEach((entry) => {
-      code += `${"\t".repeat(indentationLevel)}`;
-      switch (entry[1].getVarType()) {
-        case DataType.Character:
-          code +=
-            entry[1].getVarName() +
-            " = '" +
-            entry[1].getInitialVarValue() +
-            "'";
-          break;
-        case DataType.String:
-          code +=
-            entry[1].getVarName() +
-            ' = "' +
-            entry[1].getInitialVarValue() +
-            '"';
-          break;
-        case DataType.Integer:
-          code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue();
-          break;
-        case DataType.Decimal:
-          code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue();
-          break;
-        case DataType.Boolean:
-          code += entry[1].getVarName() + " = " + entry[1].getInitialVarValue();
-          break;
-        default:
-          code += entry[1].getInitialVarValue();
+      if (
+        entry[1].getVarName().length != 0 &&
+        entry[1].getInitialVarValue().length != 0
+      ) {
+        code += `${"\t".repeat(indentationLevel)}`;
+        switch (entry[1].getVarType()) {
+          case DataType.Character:
+            code +=
+              entry[1].getVarName() +
+              " = '" +
+              entry[1].getInitialVarValue() +
+              "'";
+            break;
+          case DataType.String:
+            code +=
+              entry[1].getVarName() +
+              ' = "' +
+              entry[1].getInitialVarValue() +
+              '"';
+            break;
+          default: {
+            code +=
+              entry[1].getVarName() + " = " + entry[1].getInitialVarValue();
+            break;
+          }
+        }
+        code += ";\n";
       }
-      code += ";\n";
     });
     return code;
   }

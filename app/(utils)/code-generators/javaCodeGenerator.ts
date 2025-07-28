@@ -162,50 +162,44 @@ export class JavaCodeGenerator extends CodeGenerator {
   initializeVariables(indentationLevel: number): string {
     let code = "";
     this.variables.entries().forEach((entry) => {
-      code += `${"\t".repeat(indentationLevel)}`;
-      switch (entry[1].getVarType()) {
-        case DataType.Character:
-          code +=
-            "char " +
-            entry[1].getVarName() +
-            " = '" +
-            entry[1].getInitialVarValue() +
-            "'";
-          break;
-        case DataType.String:
-          code +=
-            "String " +
-            entry[1].getVarName() +
-            ' = "' +
-            entry[1].getInitialVarValue() +
-            '"';
-          break;
-        case DataType.Integer:
-          code +=
-            "int " +
-            entry[1].getVarName() +
-            " = " +
-            entry[1].getInitialVarValue();
-          break;
-        case DataType.Decimal:
-          code +=
-            "float " +
-            entry[1].getVarName() +
-            " = " +
-            entry[1].getInitialVarValue() +
-            "f";
-          break;
-        case DataType.Boolean:
-          code +=
-            "boolean " +
-            entry[1].getVarName() +
-            " = " +
-            entry[1].getInitialVarValue().toLowerCase();
-          break;
-        default:
-          code += entry[1].getInitialVarValue();
+      if (entry[1].getVarName().length != 0) {
+        code += `${"\t".repeat(indentationLevel)}`;
+        switch (entry[1].getVarType()) {
+          case DataType.Character:
+            code += "char " + entry[1].getVarName();
+            if (entry[1].getInitialVarValue().length != 0) {
+              code += " = '" + entry[1].getInitialVarValue() + "'";
+            }
+            break;
+          case DataType.String:
+            code += "String " + entry[1].getVarName();
+            if (entry[1].getInitialVarValue().length != 0) {
+              code += ' = "' + entry[1].getInitialVarValue() + '"';
+            }
+            break;
+          case DataType.Integer:
+            code += "int " + entry[1].getVarName();
+            if (entry[1].getInitialVarValue().length != 0) {
+              code += " = " + entry[1].getInitialVarValue();
+            }
+            break;
+          case DataType.Decimal:
+            code += "float " + entry[1].getVarName();
+            if (entry[1].getInitialVarValue().length != 0) {
+              code += " = " + entry[1].getInitialVarValue() + "f";
+            }
+            break;
+          case DataType.Boolean:
+            code += "boolean " + entry[1].getVarName();
+            if (entry[1].getInitialVarValue().length != 0) {
+              code += " = " + entry[1].getInitialVarValue().toLowerCase();
+            }
+            break;
+          default:
+            code += entry[1].getInitialVarValue();
+        }
+        code += ";\n";
       }
-      code += ";\n";
     });
     return code;
   }
