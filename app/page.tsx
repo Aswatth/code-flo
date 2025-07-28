@@ -41,7 +41,7 @@ import SetNode from "./(nodes)/variableNode/setNode/page";
 import { DataType } from "./(utils)/dataType";
 
 export default function Home() {
-  const { fileName, setFileName } = fileNameStore();
+  const { fileName } = fileNameStore();
   const [menu, setMenu] = useState(null);
   const [paneMenu, setPaneMenu] = useState(null);
   const ref = useRef(null);
