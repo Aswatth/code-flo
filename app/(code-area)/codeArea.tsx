@@ -81,8 +81,6 @@ export default function CodeArea({ nodes, edges }: CodeAreaProps) {
         >
           <option>Java</option>
           <option>Python</option>
-          <option>Javascript</option>
-          <option>Go</option>
         </select>
       </div>
       <SyntaxHighlighter
