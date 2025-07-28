@@ -153,7 +153,6 @@ export class CFOperationNode extends CFNode {
 
   private updateDataTypeMap(operand: VarValueType, valueToUpdate: number) {
     if (typeof operand === "string") {
-      console.log(operand);
       if (operand.includes(".") || operand.includes("e")) {
         let currCount: number = this.operandDataTypeMap.get(DataType.Decimal)!;
         this.operandDataTypeMap.set(
