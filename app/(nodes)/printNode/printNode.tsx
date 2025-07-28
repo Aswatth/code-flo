@@ -2,10 +2,9 @@ import styles from "./page.module.css";
 import {
   Handle,
   Position,
-  useNodeConnections,
-  useReactFlow,
+    useReactFlow,
 } from "@xyflow/react";
-import { CFPrintNode, CFVariableNode } from "@/app/(utils)/nodes";
+import { CFPrintNode } from "@/app/(utils)/nodes";
 
 type PrintNodeProps = {
   readonly data: any;

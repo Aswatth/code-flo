@@ -1,3 +1,4 @@
+"use client";
 import { useReactFlow } from "@xyflow/react";
 import styles from "./page.module.css";
 import { RFNodeData } from "../(utils)/globals";

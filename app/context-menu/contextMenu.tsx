@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback } from "react";
 import { useReactFlow, getIncomers } from "@xyflow/react";
 import styles from "./page.module.css";
