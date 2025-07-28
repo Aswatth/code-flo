@@ -19,8 +19,8 @@ import "@xyflow/react/dist/style.css";
 import CodeArea from "./(code-area)/codeArea";
 import { fileNameStore } from "./(utils)/(data_stores)/fileNameStore";
 import React, { useCallback, useRef, useState } from "react";
-import StartNode from "./(nodes)/startNode/page";
-import PrintNode from "./(nodes)/printNode/page";
+import StartNode from "./(nodes)/startNode/startNode";
+import PrintNode from "./(nodes)/printNode/printNode";
 import {
   CFNode,
   CFOperationNode,
@@ -29,22 +29,33 @@ import {
   CFStartNode,
   CFVariableNode,
 } from "./(utils)/nodes";
-import ContextMenu from "./context-menu/page";
+import ContextMenu from "./context-menu/contextMenu";
 import { RFNodeData, startNodeId } from "./(utils)/globals";
 import VariableSpace from "./(variable-space)/variableSpace";
-import VariableNode from "./(nodes)/variableNode/page";
+import VariableNode from "./(nodes)/variableNode/variableNode";
 import { VariableStore } from "./(utils)/(data_stores)/variableStore";
-import PaneContextMenu from "./pane-context-menu/page";
-import OperationNode from "./(nodes)/operationNode/page";
+import PaneContextMenu from "./pane-context-menu/paneMenu";
+import OperationNode from "./(nodes)/operationNode/operationNode";
 import toast, { Toaster } from "react-hot-toast";
-import SetNode from "./(nodes)/variableNode/setNode/page";
+import SetNode from "./(nodes)/variableNode/setNode/setNode";
 import { DataType } from "./(utils)/dataType";
 
 export default function Home() {
+  type MenuInfo = {
+    id: string;
+    top: number | boolean;
+    bottom: number | boolean;
+    right: number | boolean;
+    left: number | boolean;
+  } | null;
+  type PaneMenuInfo = {
+    top: number | boolean;
+    left: number | boolean;
+  } | null;
   const { fileName } = fileNameStore();
-  const [menu, setMenu] = useState(null);
-  const [paneMenu, setPaneMenu] = useState(null);
-  const ref = useRef(null);
+  const [menu, setMenu] = useState<MenuInfo>(null);
+  const [paneMenu, setPaneMenu] = useState<PaneMenuInfo>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const edgeReconnectSuccessful = useRef(true);
   const nodeTypes = {
     startNode: StartNode,
@@ -63,8 +74,10 @@ export default function Home() {
     },
   };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([initialNode]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<RFNodeData>([
+    initialNode,
+  ]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const { variables } = VariableStore();
 
   function validateEdge(connection: Connection): boolean {
@@ -239,7 +252,7 @@ export default function Home() {
     (event: any, node: any) => {
       event.preventDefault();
 
-      const pane = ref.current.getBoundingClientRect();
+      const pane = ref.current?.getBoundingClientRect()!;
 
       // Should not delete START node.
       if (node.id != startNodeId) {
@@ -266,7 +279,7 @@ export default function Home() {
     (event: any) => {
       event.preventDefault();
 
-      const pane = ref.current.getBoundingClientRect();
+      const pane = ref.current?.getBoundingClientRect()!;
 
       setPaneMenu({
         top: event.clientY - pane.top,
@@ -313,10 +326,10 @@ export default function Home() {
   const onVariableDelete = useCallback(
     (deletedId: string) => {
       // Set next incoming source node's next node to NULL
-      const incomingEdges = edges.filter((f) =>
+      const incomingEdges = edges.filter((f: Edge) =>
         f.target.startsWith("SET-" + deletedId)
       );
-      incomingEdges.forEach((f) => {
+      incomingEdges.forEach((f: Edge) => {
         nodes
           .filter((n) => n.id.startsWith(f.source))
           .forEach((e) => {
@@ -325,9 +338,10 @@ export default function Home() {
       });
 
       //Variable node connected to print node
-      let edge = edges.find(
-        (f) => f.source.startsWith(deletedId) && f.target.startsWith("PRINT")
-      );
+      let edge: Edge = edges.find(
+        (f: Edge) =>
+          f.source.startsWith(deletedId) && f.target.startsWith("PRINT")
+      )!;
       if (edge) {
         const printNode = nodes.find((f) => f.id == edge.target)?.data
           .cfNodeData as CFPrintNode;
@@ -336,10 +350,10 @@ export default function Home() {
 
       // Variable node connected to operation node
       edge = edges.find(
-        (f) =>
+        (f: Edge) =>
           f.source.startsWith(deletedId) && f.target.startsWith("OPERATION")
-      );
-      if (edge) {
+      )!;
+      if (edge && edge.targetHandle != null) {
         const operationNode = nodes.find((f) => f.id == edge.target)?.data
           .cfNodeData as CFOperationNode;
         const indexToUpdate = parseInt(edge.targetHandle.split("$")[1]);
@@ -357,7 +371,7 @@ export default function Home() {
       // Delete all edges to and from variable and set-variable nodes.
       setEdges((edges) =>
         edges.filter(
-          (edge) =>
+          (edge: Edge) =>
             !edge.source.startsWith(deletedId) &&
             !edge.target.startsWith(deletedId) &&
             !edge.source.startsWith("SET-" + deletedId) &&
@@ -411,7 +425,7 @@ export default function Home() {
 
         const node = nodes.find((f) => f.id == edge.source);
         node?.data.cfNodeData.setNextNode(null);
-        setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+        setEdges((eds) => eds.filter((e: Edge) => e.id !== edge.id));
       }
 
       edgeReconnectSuccessful.current = true;
