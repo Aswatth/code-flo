@@ -38,6 +38,7 @@ import PaneContextMenu from "./pane-context-menu/page";
 import OperationNode from "./(nodes)/operationNode/page";
 import toast, { Toaster } from "react-hot-toast";
 import SetNode from "./(nodes)/variableNode/setNode/page";
+import { DataType } from "./(utils)/dataType";
 
 export default function Home() {
   const { fileName, setFileName } = fileNameStore();
@@ -66,13 +67,87 @@ export default function Home() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { variables } = VariableStore();
 
+  function validateEdge(connection: Connection): boolean {
+    //Ensure execution handles don't connect to value handles.
+    if (
+      (connection.sourceHandle == null && connection.targetHandle != null) ||
+      (connection.sourceHandle != null && connection.targetHandle == null)
+    ) {
+      toast.error((t) => (
+        <div>
+          <p>
+            <b>Invalid connection</b>
+          </p>
+          <p>Cannot connect execution handle to value handle</p>
+        </div>
+      ));
+      return false;
+    }
+
+    // Validate data type of value handles.
+
+    // Variable to set-variable node
+    if (
+      connection.source.startsWith("VARIABLE") &&
+      connection.target.startsWith("SET-") &&
+      connection.targetHandle == "set"
+    ) {
+      const sourceCfNode = nodes.find((f) => f.id == connection.source)?.data
+        .cfNodeData as CFVariableNode;
+      const targetCfNode = nodes.find((f) => f.id == connection.target)?.data
+        .cfNodeData as CFSetVariableNode;
+
+      if (sourceCfNode.getVarType() != targetCfNode.getVarType()) {
+        toast.error((t) => (
+          <div>
+            <p>
+              <b>Error</b>
+            </p>
+            <p>
+              {`Expected ${targetCfNode.getVarType()} but got ${sourceCfNode.getVarType()}`}
+            </p>
+          </div>
+        ));
+        return false;
+      }
+    }
+
+    // Variable to operation node.
+    if (
+      connection.source.startsWith("VARIABLE") &&
+      connection.target.startsWith("OPERATION") &&
+      connection.targetHandle?.startsWith("OPERATION")
+    ) {
+      const sourceCfNode = nodes.find((f) => f.id == connection.source)?.data
+        .cfNodeData as CFVariableNode;
+
+      if (
+        sourceCfNode.getVarType() != DataType.Integer &&
+        sourceCfNode.getVarType() != DataType.Decimal
+      ) {
+        toast.error((t) => (
+          <div>
+            <p>
+              <b>Error</b>
+            </p>
+            <p>
+              {`Expected Integer or Decimal but got ${sourceCfNode.getVarType()}`}
+            </p>
+          </div>
+        ));
+        return false;
+      }
+    }
+    return true;
+  }
+
   const onConnect = useCallback(
     (connectionState: Connection) => {
       const sourceCfNode = nodes.find((f) => f.id == connectionState.source)
         ?.data.cfNodeData;
       const targetCfNode = nodes.find((f) => f.id == connectionState.target)
         ?.data.cfNodeData;
-
+      if (!validateEdge(connectionState)) return;
       if (
         connectionState.sourceHandle == null &&
         connectionState.targetHandle == null
@@ -102,17 +177,7 @@ export default function Home() {
         );
         targetCfNode.updateOperand(indexToUpdate, sourceCfNode);
       }
-
-      if (
-        (connectionState.sourceHandle == null &&
-          connectionState.targetHandle != null) ||
-        (connectionState.sourceHandle != null &&
-          connectionState.targetHandle == null)
-      ) {
-        toast.error("Cannot connect execution pin to value pin");
-      } else {
-        setEdges((edge) => addEdge(connectionState, edge));
-      }
+      setEdges((edge) => addEdge(connectionState, edge));
     },
     [nodes, setEdges]
   );
